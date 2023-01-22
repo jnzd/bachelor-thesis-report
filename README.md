@@ -1,8 +1,8 @@
-# bachelor thesis report
+# Bachelor Thesis Report
 
 ## TODO
 - [ ] Introduction
-- [ ] Background
+<!-- - [ ] Background -->
 - [ ] Architecture
 - [ ] Algorithms
 - [ ] Implementation
