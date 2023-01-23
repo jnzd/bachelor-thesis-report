@@ -9,12 +9,18 @@ A trace refers to a timestamped log of events.
 
 % TODO write possible use case for monitoring and MonPoly
 
+% TODO give overview of the goals of the project
+We extended MonPoly with a backend written in Python. The backend connects MonPoly to a time series database (QuestDB).
+It facilitates moving the monitoring from one machine to another and efficiently reload the previous state as long as the database is retained. 
+We do this by making use of relative intervals and only loading events that are within the relative interval of a formula.
+Further the backend enables a first method for changing the monitored policy.
+
 
 
 \subsection{Metric First-Order Temporal Logic}
-MonPoly can be used to monitor a subset of Metric First-Order Temporal Logic (MFOTL) \cite{Basin2015}.
-
-% \cite{Basin2015,Hublet2022}.
+MonPoly uses Metric First-Order Temporal Logic (MFOTL) \cite{Basin2015, Chomicki1995} as a policy specification language. % \cite{Basin2015,Hublet2022}.
+It can monitor a subset of possible MFOTL formulas.
+MFOTL is a 
 
 \subsection{MonPoly}
 
