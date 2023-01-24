@@ -25,18 +25,18 @@ Let's return to the example of user specified privacy preferences.
 It comes quite natural that the user might want to update their preferences.
 Currently MonPoly has no way of changing the policy it is monitoring.
 
-\subsection{Contributions}
+\subsection{Our Contributions}
 MonPoly works with timestamped, tabular data.
 The schema of the table is given to MonPoly as a signature file at launch.
 This makes the connection of MonPoly with a time series database quite natural.
 Many of the aforementioned shortcomings of MonPoly can be overcome by combining it with a separate database.
 
-We extended MonPoly with a backend written in Python.
-The backend connects MonPoly to a time series database (QuestDB).
-It facilitates moving the monitoring from one machine to another and efficiently reload the previous state as long as the database is retained. 
-We do this by making use of relative intervals and only loading events that are within the relative interval of a formula.
-Further the backend enables a first method for changing the monitored policy.
-
+We extend MonPoly with a backend written in Python.
+Via this backend we connect MonPoly with a time series database (QuestDB \cite{questdb}).
+This greatly increases the usability of MonPoly.
+The data portability gained through the database connection allows us to use MonPoly as a web server.
+It also allowed us to offer a first version of a policy change.
+We make use of relative intervals to only query the relevant timeframes to a given formula from the database.
 
 
 
