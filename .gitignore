@@ -1,4 +1,5 @@
 *.code-workspace
+.vscode/*
 
 ## latex gitignore from: https://github.com/github/gitignore/blob/main/TeX.gitignore
 
