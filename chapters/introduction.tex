@@ -1,29 +1,42 @@
 \section{Introduction}
 
-MonPoly \cite{Basin2017} is a tool for runtime monitoring, also called Runtime Verification (RV) \cite{Bartocci2018}.
-Runtime monitoring is a method for checking a systems behaviour against a formal specification during or after execution of the system.
-If the monitoring happens during execution this is called online monitoring and if it is done after the system is done executing we call this offline monitoring.
-MonPoly is capable of both forms of monitoring.
-The monitoring is done on a trace of the system.
-A trace refers to a timestamped log of events.
+Our digital world consists of many large and small systems.
+Those systems are continuously logging vast amounts of data.
+In many use cases one might want to monitor those logs of data and check that those logs conform with a predefined specification.
+In case of a violation of such a specification or policy one might want to catch that violation and then trigger an appropriate action.
+Such monitoring is part of Runtime Verification (RV) \cite{Bartocci2018}.
 
-% TODO write possible use case for monitoring and MonPoly
+One potential system is any service that handles user data.
+A user might be able to give and revoke permission to perform certain actions with their data.
+Like sharing it with advertisers or a different part of the same company.
+Or maybe there are data protection laws and regulations that restrict what can be done with user data.
 
-% TODO give overview of the goals of the project
-We extended MonPoly with a backend written in Python. The backend connects MonPoly to a time series database (QuestDB).
+MonPoly \cite{Basin2017} is a tool for runtime Verification.
+It can do both online and offline monitoring of policies.
+For online monitoring it accepts new events via standard input.
+For offline monitoring it can read a timestamped log file that was generated during the runtime of a system.
+
+This approach has some limitations. For one online monitoring can not easily be done on a different machine.
+Or imagine a system that has many different servers, all creating new events.
+Now we would want those events all to reach a single machine.
+The current version of MonPoly, working with standard input, is not optimized for such a use case.
+
+Let's return to the example of user specified privacy preferences.
+It comes quite natural that the user might want to update their preferences.
+Currently MonPoly has no way of changing the policy it is monitoring.
+
+\subsection{Contributions}
+MonPoly works with timestamped, tabular data.
+The schema of the table is given to MonPoly as a signature file at launch.
+This makes the connection of MonPoly with a time series database quite natural.
+Many of the aforementioned shortcomings of MonPoly can be overcome by combining it with a separate database.
+
+We extended MonPoly with a backend written in Python.
+The backend connects MonPoly to a time series database (QuestDB).
 It facilitates moving the monitoring from one machine to another and efficiently reload the previous state as long as the database is retained. 
 We do this by making use of relative intervals and only loading events that are within the relative interval of a formula.
 Further the backend enables a first method for changing the monitored policy.
 
 
 
-
-\subsection{Metric First-Order Temporal Logic}
-MonPoly uses Metric First-Order Temporal Logic (MFOTL) \cite{Basin2015, Chomicki1995} as a policy specification language. % \cite{Basin2015,Hublet2022}.
-It can monitor a subset of possible MFOTL formulas.
-MFOTL is a 
-
-\subsection{MonPoly}
-
-\subsection{Time Series Databases}
 
