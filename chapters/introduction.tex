@@ -1,42 +1,64 @@
 \section{Introduction}
 
-Our digital world consists of many large and small systems.
-Those systems are continuously logging vast amounts of data.
-In many use cases one might want to monitor those logs of data and check that those logs conform with a predefined specification.
-In case of a violation of such a specification or policy one might want to catch that violation and then trigger an appropriate action.
-Such monitoring is part of Runtime Verification (RV) \cite{Bartocci2018}.
+Our digital world consists of many hardware and software systems.
+These systems are continuously performing a lot of actions.
+For a variety of reasons one might want to monitor those actions and make sure that they do not violate some predefined specification.
+One way to achieve this is to log relevant actions and analyze these logs.
+Such monitoring is part of the field of Runtime Verification (RV) \cite{Bartocci2018}.
+The analysis of the logs can either be done \textit{online} while the system is running or it can be done \textit{offline} after the system has terminated.
 
-One potential system is any service that handles user data.
-A user might be able to give and revoke permission to perform certain actions with their data.
-Like sharing it with advertisers or a different part of the same company.
-Or maybe there are data protection laws and regulations that restrict what can be done with user data.
+Consider a social media site.
+It is bound by an increasing number of privacy laws and regulations.
+Let a hypothetical piece of regulation be that a user's location information may not be used to tailor advertisements to that user unless the user gave specific permission.
+Then the site could log every time instance when a user's location data is accessed and the purpose of the access.
+In words the predefined specification the site wants to check then could be:
+    "If a user's location data is accessed and the purpose of the access is for tailoring advertisements, the user must have previously given permission for there location data to be used for advertising purposes".
 
-MonPoly \cite{Basin2017} is a tool for runtime Verification.
-It can do both online and offline monitoring of policies.
+MonPoly \cite{Basin2017} is a tool for such runtime monitoring.
+It can do both online and offline monitoring.
 For online monitoring it accepts new events via standard input.
 For offline monitoring it can read a timestamped log file that was generated during the runtime of a system.
+It uses Metric First-Order Temporal Logic (MFOTL) \cite{Basin2008, Basin2015, Chomicki1995} as a formal specification language, which we will introduce in the background section.
 
-This approach has some limitations. For one online monitoring can not easily be done on a different machine.
-Or imagine a system that has many different servers, all creating new events.
-Now we would want those events all to reach a single machine.
-The current version of MonPoly, working with standard input, is not optimized for such a use case.
+MonPoly in its current state has some limitations that we want to improve.
+For one, online monitoring can not easily be done on a different machine from which the system is running on.
+This does not fit well with the way many modern systems operate.
+Modern systems are often very distributed.
+It is common that different functions of a system run on different machines.
+Be that physical or virtual ones.
+Often time multiple machines also perform the same kind of operation.
+Take caching servers as an example.
+MonPoly in its current state does not fit well into this world of interconnected microservices.
 
-Let's return to the example of user specified privacy preferences.
-It comes quite natural that the user might want to update their preferences.
-Currently MonPoly has no way of changing the policy it is monitoring.
+Another issue that MonPoly faces currently is data portability.
+MonPoly can store its execution state to disk before stopping.
+It can also restore that state, but only on the same system as the way it stores the state is tied to the physical memory configuration of the system.
+We would like the ability to have MonPoly run on one system, then shut it down and restart it on a different system where it resumes with the same state that the monitor had before shutting down on the first system.
+
+Further there is no way to update the monitored policy.
+We aim to offer a first method for policy changes with minimal overhead in time and compute power.
 
 \subsection{Our Contributions}
-MonPoly works with timestamped, tabular data.
-The schema of the table is given to MonPoly as a signature file at launch.
-This makes the connection of MonPoly with a time series database quite natural.
-Many of the aforementioned shortcomings of MonPoly can be overcome by combining it with a separate database.
+We extend MonPoly with a web based backend written in Python using Flask \cite{}.
+This backend provides a REST API \cite{} to MonPoly.
+Packaging MonPoly as a web app and offering a new API offers greater flexibility in how MonPoly can be used.
 
-We extend MonPoly with a backend written in Python.
-Via this backend we connect MonPoly with a time series database (QuestDB \cite{questdb}).
-This greatly increases the usability of MonPoly.
-The data portability gained through the database connection allows us to use MonPoly as a web server.
-It also allowed us to offer a first version of a policy change.
-We make use of relative intervals to only query the relevant timeframes to a given formula from the database.
+Through this backend we also connect MonPoly to a database.
+MonPoly works with timestamped and tabular data.
+We make use of this fact for the choice of database.
+The temporal nature of the data leads us to time series databases \cite{}, which, as the name implies, are optimized for temporal data.
+By far the most common type of databases are relational databases.
+This is a great coincidence, because relational databases make extensive use of tables for storing data.
+We looked at a few different relational time series databases.
+In the end we opted for QuestDB \cite{questdb}.
+
+The addition of a database gives us more options in terms of data portability.
+The state of MonPoly is now not only stored in the system memory of the system currently running MonPoly, but also in the database.
+
+This allows us to stop MonPoly on one system and resume the monitoring on a different system, by querying the database.
+We make use of relative intervals \cite{} to get a good over approximation of the data needed to continue monitoring a specific formula.
+
+We use the database to offer a first version of a policy change by stopping the monitor and starting a new one with the events within the relative interval of the new policy already loaded.
 
 
 
