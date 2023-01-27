@@ -54,7 +54,7 @@ The last two events get triggered when a user either grants or revokes permissio
 Let's now define the policy in a formal manner.
 \begin{align*}
     \Always &((\exists x \cdot \texttt{loc\_accessed(i, x)} 
-        \land (x = \text{advertising})) \\
+        \land (x = \text{"advertising"})) \\
     &\implies (\Once_{[0,\infty)} \texttt{perm\_granted(i)} 
          \land  \neg (\texttt{perm\_revoked(i)} \Since_{[0,\infty)} 
             \texttt{perm\_granted(i)})))
@@ -65,7 +65,7 @@ The remaining formula in MonPoly syntax is the following:
 
 % \begin{center}
 \begin{verbatim}
-(EXISTS x. (x loc_accessed(i, x) AND x = advertising)) 
+(EXISTS x. (loc_accessed(i, x) AND x = "advertising")) 
 IMPLIES 
 (
     (ONCE[0,*) perm_granted(i)) 
@@ -74,5 +74,7 @@ IMPLIES
 )
 \end{verbatim}
 
+While MonPoly cannot actually monitor this formula directly, it can monitor the negation of this formula.
+For this on can use the \texttt{-negate} flag when running MonPoly.
 
 \subsection{Time Series Databases}
