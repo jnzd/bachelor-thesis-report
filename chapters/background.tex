@@ -36,12 +36,6 @@ In MonPoly a policy is tied to a signature.
 A signature can be compared with a database schema and describes the arity and types of possible events.
 So let's consider a possible signature for our example: 
 
-% \begin{center}
-%     \texttt{loc\_accessed(user\_id: int, purpose: string)} \\
-%     \texttt{perm\_granted(user\_id: int)} \\
-%     \texttt{perm\_revoked(user\_id: int)}
-% \end{center}
-
 \begin{verbatim}
 loc_accessed(user_id: int, purpose: string)
 perm_granted(user_id: int)
@@ -60,10 +54,9 @@ Let's now define the policy in a formal manner.
             \texttt{perm\_granted(i)})))
 \end{align*}
 
-For MonPoly we first get rid of the surrounding $\Always$, because MonPoly implicitly adds an always to any policy.
+For MonPoly we first get rid of the surrounding $\Always$, because MonPoly implicitly adds an always-operator around any policy.
 The remaining formula in MonPoly syntax is the following:
 
-% \begin{center}
 \begin{verbatim}
 (EXISTS x. (loc_accessed(i, x) AND x = "advertising")) 
 IMPLIES 
@@ -78,3 +71,20 @@ While MonPoly cannot actually monitor this formula directly, it can monitor the 
 For this on can use the \texttt{-negate} flag when running MonPoly.
 
 \subsection{Time Series Databases}
+
+Time series databases are a class of databases optimized for timestamped data.
+For example, they optimize for data retrieval within a certain time range.
+With the advance of internet of things devices with built-in sensors time series databases are experiencing explosive growth.
+And as we have established they happen to fit well with our monitoring goals.
+There are many different options of time series databases available.
+We were looking for something with good performance, good support for tables of data, and good usability.
+We have opted for QuestDB \cite{questdb}.
+
+It has a column-based storage model \cite{questdb-storage-model}.
+QuestDB supports the PostgreSQL wire protocol \cite{questdb-postgres-wire} for querying and inserting data.
+It further provides a REST API and has a web console for both inserting and querying data.
+For best performance it supports the InfluxDB Line Protocol \cite{questdb-influx-db-line-protocol} with client libraries for most popular modern programming languages.
+QuestDB itself is written in Java, open source, and licensed under the Apache 2.0 license.
+ 
+
+
