@@ -39,11 +39,11 @@ Further there is no way to update the monitored policy.
 We aim to offer a first method for policy changes with minimal overhead in time and compute power.
 
 \subsection{Our Contributions}
-We extend MonPoly with a web based backend written in Python using Flask \cite{}.
-This backend provides a REST API \cite{} to MonPoly.
+We extend MonPoly with a web based wrapper written in Python using Flask \cite{}.
+This wrapper provides a REST API \cite{} to MonPoly.
 Packaging MonPoly as a web app and offering a new API offers greater flexibility in how MonPoly can be used.
 
-Through this backend we also connect MonPoly to a database.
+Through this wrapper we also connect MonPoly to a database.
 MonPoly works with timestamped and tabular data.
 We make use of this fact for the choice of database.
 The temporal nature of the data leads us to time series databases \cite{}, which, as the name implies, are optimized for temporal data.
