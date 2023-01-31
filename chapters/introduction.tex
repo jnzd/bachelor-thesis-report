@@ -1,5 +1,7 @@
 \section{Introduction}
 
+\subsection{Motivation}
+
 Our digital world consists of many hardware and software systems.
 These systems are continuously performing a lot of actions.
 For a variety of reasons one might want to monitor those actions and make sure that they do not violate some predefined specification.
@@ -35,15 +37,11 @@ MonPoly can store its execution state to disk before stopping.
 It can also restore that state, but only on the same system as the way it stores the state is tied to the physical memory configuration of the system.
 We would like the ability to have MonPoly run on one system, then shut it down and restart it on a different system where it resumes with the same state that the monitor had before shutting down on the first system.
 
-Further there is no way to update the monitored policy.
+Further there is no built-in way to update the monitored policy.
 We aim to offer a first method for policy changes with minimal overhead in time and compute power.
 
-\subsection{Our Contributions}
-We extend MonPoly with a web based wrapper written in Python using Flask \cite{}.
-This wrapper provides a REST API \cite{} to MonPoly.
-Packaging MonPoly as a web app and offering a new API offers greater flexibility in how MonPoly can be used.
+We improve MonPoly in these aspects by building a wrapper that connects it with a database and also provides a new, more web friendly, interface to MonPoly.
 
-Through this wrapper we also connect MonPoly to a database.
 MonPoly works with timestamped and tabular data.
 We make use of this fact for the choice of database.
 The temporal nature of the data leads us to time series databases \cite{}, which, as the name implies, are optimized for temporal data.
@@ -52,13 +50,26 @@ This is a great coincidence, because relational databases make extensive use of 
 We looked at a few different relational time series databases.
 In the end we opted for QuestDB \cite{questdb}.
 
-The addition of a database gives us more options in terms of data portability.
-The state of MonPoly is now not only stored in the system memory of the system currently running MonPoly, but also in the database.
+\subsection{Contributions}
+We extend MonPoly with a web based wrapper written in Python using Flask \cite{Flask}.
+This wrapper provides a REST API \cite{Fielding2000} to MonPoly.
+Packaging MonPoly as a web app and offering a new API that offers greater flexibility in how MonPoly can be used.
 
-This allows us to stop MonPoly on one system and resume the monitoring on a different system, by querying the database.
-We make use of relative intervals \cite{} to get a good over approximation of the data needed to continue monitoring a specific formula.
+Through this wrapper we connect MonPoly to a database.
+The addition of a database gives us more options in terms of data portability.
+The state of the database is consistent with that of the monitor.
+
+The database connection allows us to stop MonPoly on one system and resume the monitoring on a different system, by querying the database.
+We make use of relative intervals \cite{Basin2017} to get a good over approximation of the data needed to continue monitoring a specific formula.
 
 We use the database to offer a first version of a policy change by stopping the monitor and starting a new one with the events within the relative interval of the new policy already loaded.
 
+Finally we have made a few additions to MonPoly itself that were needed for our wrapper.
+We added flags to MonPoly to print the schema of a given signature in SQL as well as JSON format.
+One of our aims was fault tolerance and for this we added some options to keep that would keep the monitor running instead of exiting when encountering certain issues.
+For the policy change we need to potentially reload a lot of events into the monitor.
+We added an option to first read events from a file and then switch to standard input.
+Previously the monitor would either read a file and then stop or continuously read from standard input.
+We have begun work on a different method of doing a policy change by changing only parts of a formula while MonPoly keeps running and can keep the state of the formula parts that are unchanged.
 
 
