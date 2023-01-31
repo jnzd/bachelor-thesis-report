@@ -21,3 +21,15 @@ If MonPoly reports an issue with a certain time stamp, either it is out of order
 If no issue is detected with a timestamp all events in at that timestamp get forwarded to the database.
 
 \subsection{Policy Change}
+
+This first version of a policy change functions by stopping the current monitor and starting a new one.
+When starting the new monitor we want to restore the state of the old one.
+We do this by querying old events from our database.
+But we do not simply query for the entirety of the database.
+We make two optimizations.
+First we use relative intervals and second we make use of constant values.
+For each predicate occurring in a formula we look for constant attributes in its occurrences.
+For every predicate and its potential occurrences with different constant values we then compute an over approximation of the relative interval.
+We use this information to create a SQL query that only queries the constant values combined with the interval.
+This way we minimize the amount of data that the new monitor has to read and process.
+
