@@ -1,0 +1,19 @@
+\tikzset{block/.style={draw, thick, text width=3cm, minimum height=1.5cm, align=center},   
+% the align command is used to align the block diagram at the center  
+% the height command adjust the height of the block diagram  
+% here block diagram refers to the whole diagram, not the single block  
+% the thick command here signifies the border of all the blocks used inside the block diagram. You can change it to thin command if you want the thin edge of the blocks  
+line/.style={-latex}   % the lesser the width the greater will be the diagram window  
+}  
+
+\begin{tikzpicture}[node distance=2.5cm,auto,>=latex']
+    \node[block] (a) {Wrapper};  
+    \node[block,right=of a] (b) at ([yshift=1cm]$(a)$) {MonPoly};
+    % you can use as many blocks by specifying the name and alphabets  
+    \node[block,right=of a] (c) at ([yshift=-1cm]$(a)$){Questdb};  
+    % the yshift here specifies the shift in the position of the point on the y-axis. You can change the location according to the requirements.  
+    % the value mentioned is the distance from (b) to (c). If the value is 0.5, then the block will be at the center of (b) and (c).  
+
+    \draw[line] (a)--(b);  
+    \draw[line] (a)--(c);
+\end{tikzpicture}
