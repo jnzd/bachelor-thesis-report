@@ -1,3 +1,57 @@
 \section{Algorithms}
-relative intervals \cite{}
+
+
+\subsection{Relative Intervals}
+We extend the idea of relative intervals \cite{Basin2016}.
+No event outside a MFOTL formula's relative interval can influence the truth value of that formula.
+This property is useful to us when restoring the state of the monitor by reloading past events, because it limits the amount of events we have to load and query from the database.
+Our extension further limits the number of relevant events.
+Events are tied to specific predicates.
+In our ongoing example we have the predicates \texttt{loc\_accessed, perm\_granted, perm\_revoked}.
+Depending on the formula structure, different predicates might have different relative intervals which can reduce the number of relevant events.
+The exact details of the extension will be explained after this next part.
+
+We combine this extension with another optimization involving constant values.
+Let's recall our example formula from earlier.
+
+\begin{verbatim}
+loc_accessed(i, "advertising") 
+IMPLIES 
+(
+    (ONCE[0,*) perm_granted(i)) 
+    AND 
+    (NOT (perm_revoked(i) SINCE[0,*) perm_granted(i)))
+)
+\end{verbatim}
+
+We scan all occurrences of any predicate and check if the attributes are constants or variable and noting down any constant values.
+Doing this for the example yields the following.
+
+\begin{verbatim}
+loc_accessed:
+    variable, constant: "advertising"
+
+perm_granted:
+    variable
+
+perm_revoked:
+    variable
+\end{verbatim}
+
+We call a list variable or constant attributes a mask.
+It is possible that the same predicate has multiple different masks, if it occurs with different constant values or if attributes at different positions are constant.
+
+Now we have all the pieces to explore our full data structure for the extended relative intervals.
+We not only compute the relative interval for every predicate, but for every mask per predicate.
+For this we use a doubly nested map data structure.
+First mapping from predicate names to masks.
+And then mapping from the masks to their relative intervals.
+
+In the rest of this section we explore the concrete algorithm used to compute the described data structure.
+
+
+
+
+\subsection{}
+
 
