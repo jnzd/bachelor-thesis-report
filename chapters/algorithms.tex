@@ -1,18 +1,73 @@
-\section{Algorithms}
+\chapter{Algorithms}
+
+\section{Policy Change}
+This section gives a high level view of our policy change method.
+The individual parts of the policy change will be explained in the following sections of this chapter.
+We have a running instance of MonPoly monitoring some policy.
+The user asks the wrapper to monitor a new policy.
+The wrapper checks the monitorability of the new policy against the existing policy.
+If it is not monitorable the wrapper keeps the current instance of MonPoly running and reports the issue with the new policy to the user.
+Otherwise the wrapper uses MonPoly to get the extended relative intervals of the new policy.
+Then these extended relative intervals get converted to SQL queries and the wrapper runs these queries on QuestDB.
+The response from QuestDB gets converted into a MonPoly log file.
+Next the wrapper stops the current iteration of MonPoly and starts a new one that first reads the created log file.
+At this point the policy change is done, and the wrapper can continue with its normal operation.
 
 
-\subsection{Relative Intervals}
-We extend the idea of relative intervals \cite{Basin2016}.
-No event outside a MFOTL formula's relative interval can influence the truth value of that formula.
-This property is useful to us when restoring the state of the monitor by reloading past events, because it limits the amount of events we have to load and query from the database.
-Our extension further limits the number of relevant events.
-Events are tied to specific predicates.
-In our ongoing example we have the predicates \texttt{loc\_accessed, perm\_granted, perm\_revoked}.
-Depending on the formula structure, different predicates might have different relative intervals which can reduce the number of relevant events.
-The exact details of the extension will be explained after this next part.
+\section{Relative Intervals}
 
-We combine this extension with another optimization involving constant values.
-Let's recall our example formula from earlier.
+First we append the definition of relative intervals from Basin et al. \cite{Basin2016} to include all operators currently supported by MonPoly.
+Namely we add definitions for the MFODL operators.
+Intervals are defined over $\mathbb{Z}$ and can either be open or closed.
+The operators $\oplus$ and $\Cup$ are defined the same way as in Basin et al. \cite{Basin2016}.
+Let $I$ and $J$ be some arbitrary intervals then $I \oplus J := \{i+j \mid i \in I \text{ and } j \in J\}$ and $I \Cup J$ is the smallest interval containing all values in both $I$ and $J$.
+
+\begin{equation*}
+    \RI(\varphi) =
+    \begin{cases}
+        \{0\}     & \text{if $\varphi$ is an an atomic formula} \\ 
+        \RI(\psi) & \text{if $\varphi$ is of the form $\neg \psi$, 
+                            $\exists x.\psi$ (, $\forall x.\psi$, 
+                            or $\varphi$ is an aggregation over $\psi$, let ..., letPast ...)} \\
+        \RI(\psi) \Cup \RI(\chi) & \text{if $\varphi$ is of the form $\psi \lor \chi,
+                                         (\psi \land \chi, ...)$} \\
+        (-b,0] \Cup ((-b,-a] \oplus \RI(\psi)) & \text{if $\varphi$ is of the form $\Previous_{[a,b)}\psi$} \\
+        [0,b) \Cup ([a,b) \oplus \RI(\psi)) & \text{if $\varphi$ is of the form $\Next_{[a,b)}$}\\
+        (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)) & \text{if $\varphi$ is of the form $\psi \Since_{[a,b)} \chi$} \\
+        [0,b) \Cup ([0,b) \oplus \RI(\psi)) \Cup ([a,b) \oplus \RI(\chi)) & \text{if $\varphi$ is of the form $\psi \Until_{[a,b)} \chi$} \\
+        [0,b) \Cup ([0,b) \oplus \RIr(\psi)) & \text{if $\varphi$ is of the form $\Fregex_{[a,b)} \psi$ }\\
+        (-b,0] \Cup ((-b,0] \oplus \RIr(\psi)) & \text{if $\varphi$ is of the form $\Pregex_{[a,b)} \psi$ }\\
+    \end{cases}
+\end{equation*}
+
+We recursively define the relative interval of regular expressions as seen in Basin et al. \cite{Basin2020} in the following, recursive way.
+
+\begin{equation*}
+    \RIr(\rho) =
+    \begin{cases}
+        \{0\} & \text{if $\rho$ is of the form $\star^k$} \\
+        \RI(\varphi) & \text{if $\rho$ is of the form \textit{test} $\varphi$ ???} \\
+        \RIr(\sigma) \Cup \RIr(\tau) & \text{if $\rho$ is of the form $\sigma + \tau$ or $\sigma \cdot \tau$} \\
+        \RIr(\sigma) & \text{if $\rho$ is of the form $\sigma^*$}
+
+    \end{cases}
+\end{equation*}
+
+We now show the correctness of our definition of the relative intervals for both the past and future match operators as well as the regular expressions.
+
+% TODO
+....
+
+\section{Relative Interval Extension}
+
+This idea of relative intervals can already filter an existing trace down to a much smaller one by removing events that are unnecessary for the evaluation of a given policy.
+We expand on this by creating and using a data structure that allows us to select an even smaller sub trace with the same effect of not changing the truth value of the policy.
+
+First we move from one relative interval for an entire policy to one relative interval per predicate occurring in a policy.
+We break this down further.
+Every predicate comes with a number of attributes as defined in the signature.
+Some attributes are potentially constant.
+Looking back at our example from earlier, \texttt{"advertising"} is one such constant attribute in the predicate \texttt{loc\_accessed}.
 
 \begin{verbatim}
 loc_accessed(i, "advertising") 
@@ -24,34 +79,90 @@ IMPLIES
 )
 \end{verbatim}
 
-We scan all occurrences of any predicate and check if the attributes are constants or variable and noting down any constant values.
-Doing this for the example yields the following.
+This means any occurrence of the predicate \texttt{loc\_accessed} where the second attribute is not \texttt{"advertising"}, has no influence on our policy and is therefore not needed in a potential sub trace.
+We check every predicate in our policy for constant attributes.
+Then we take the set of different arrangements of constant and variable attributes per predicate.
+We call one such arrangement a mask.
+Each mask has its own relative interval.
+For our example the masks with their corresponding relative intervals are the following.
 
 \begin{verbatim}
-loc_accessed:
-    variable, constant: "advertising"
-
-perm_granted:
-    variable
-
-perm_revoked:
-    variable
+loc_accessed(*,"advertising") -> [0,0]
+perm_granted(*) -> (*,0]
+perm_revoked(*) -> (*,0]
 \end{verbatim}
 
-We call a list variable or constant attributes a mask.
-It is possible that the same predicate has multiple different masks, if it occurs with different constant values or if attributes at different positions are constant.
+A \texttt{*} in the attributes denotes a variable value.
+In larger formulas there can be multiple different masks per predicate.
 
-Now we have all the pieces to explore our full data structure for the extended relative intervals.
-We not only compute the relative interval for every predicate, but for every mask per predicate.
-For this we use a doubly nested map data structure.
-First mapping from predicate names to masks.
-And then mapping from the masks to their relative intervals.
+We use a doubly nested map data structure to store the predicates with there masks and relative intervals and call such a structure the extended relative intervals of a formula.
+On the first level the keys are predicate names and values are maps from masks to intervals.
+On this data structure we define the operators $\Cupmerge$, $\Cupext$ and $\oplusext$.
+Let $m$ and $n$ be two extended relative intervals and $i$ a positive interval, then 
+\begin{align*}
+    m \Cupmerge n = 
+        & \{ p(l) \rightarrow (i \Cup j) \mid &
+            p(l) \rightarrow i \in m \text{ and } 
+            p(l) \rightarrow j \in n \} \\
+        & \cup \{p(l) \rightarrow i \mid & 
+            (p(l) \rightarrow i \in m \text{ and }
+            p(l) \in \keys({m \setminus n})) \} \\
+        & \cup \{p(l) \rightarrow i \mid & 
+            (p(l) \rightarrow i \in n \text{ and }
+            p(l) \in \keys({n \setminus m}))
+            \}        
+            \\
+    i \Cupext m = 
+        & \{ p(l) \rightarrow (i \Cup j) \mid &
+            p(l) \rightarrow j \in m \} \\
+    i \oplusext m = \\
+        & \{ p(l) \rightarrow (i \oplus j) \mid &
+            p(l) \rightarrow j \in m \} \\
+\end{align*}
 
-In the rest of this section we explore the concrete algorithm used to compute the described data structure.
+The notation $p(l) \rightarrow i$ denotes an element in our doubly nested map structure.
+$p$ is a first level key, i.e. a predicate name, $l$ is a second level key, i.e. a mask and $i$ denotes the interval the key combination $p(l)$ is pointing to.
+The $\keys$ operator gives all combinations of outer keys (predicate names) and inner keys (masks) in an extended relative intervals structure.
+With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now give a recursive definition for our extended relative intervals.
+In addition we need to helper functions $\inveri(m)$ which inverses all intervals in a map $m$ and $\zeroeri(m)$ which sets the lower bound of all intervals in the map $m$ to zero.
 
+\begin{equation*}
+    \ERI(\varphi) =
+    \begin{cases}
+        \{\} \\
+             \quad\quad\quad \text{if $\varphi$ is an an atomic formula and not a predicate} \\ 
+        \{p(m) \rightarrow [0,0]\} \\
+             \quad\quad\quad \text{if $\varphi$ is a predicate with name $p$ and mask $m$} \\
+        \ERI(\psi) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\neg \psi$ or $\exists x.\psi$} \\
+        \ERI(\psi) \Cupmerge \ERI(\chi) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\psi \lor \chi, (\psi \land \chi, ...)$} \\
+        (-b,0] \Cupext ((-b,-a] \oplusext \ERI(\psi)) \\ 
+            \quad\quad\quad \text{if $\varphi$ is of the form $\Previous_{[a,b)}\psi$} \\
+        [0,b) \Cupext ([a,b) \oplusext \ERI(\psi)) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\Next_{[a,b)}$}\\
+        (-b,0] \Cupext ((-b,0] \oplusext \ERI(\psi)) \Cupmerge ((-b,-a] \oplusext \ERI(\chi)) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\psi \Since_{[a,b)} \chi$} \\
+        [0,b) \Cupext ([0,b) \oplusext \ERI(\psi)) \Cupmerge ([a,b) \oplusext \ERI(\chi)) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\psi \Until_{[a,b)} \chi$} \\
+        [0,b) \Cupext ([0,b) \oplusext \ERIr(\psi)) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\Fregex_{[a,b)} \psi$ }\\
+        (-b,0] \Cupext ((-b,0] \oplusext \ERIr(\psi)) \\
+            \quad\quad\quad \text{if $\varphi$ is of the form $\Pregex_{[a,b)} \psi$ }\\
+    \end{cases}
+\end{equation*}
 
+And for regular expressions we define 
+\begin{equation*}
+    \ERIr(\rho) =
+    \begin{cases}
+        \{\} & \text{if $\rho$ is of the form $\star^k$} \\
+        \ERI(\varphi) & \text{if $\rho$ is of the form \textit{test} $\varphi$ ???} \\
+        \ERIr(\sigma) \Cupmerge \ERIr(\tau) & \text{if $\rho$ is of the form $\sigma + \tau$ or $\sigma \cdot \tau$} \\
+        \ERIr(\sigma) & \text{if $\rho$ is of the form $\sigma^*$}
+    \end{cases}
+\end{equation*}
 
-
-\subsection{}
+\section{}
 
 

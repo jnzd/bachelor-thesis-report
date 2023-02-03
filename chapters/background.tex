@@ -1,6 +1,6 @@
-\section{Background}
+\chapter{Background}
 
-\subsection{Metric First-Order Temporal Logic}
+\section{Metric First-Order Temporal Logic}
 As mentioned in the introduction, Metric First-Order Temporal Logic (MFOTL) \cite{Basin2008, Basin2015, Chomicki1995} is used as a policy specification language by MonPoly.
 Here we give a quick overview of MFOTL.
 MFOTL is well suited to express a variety of policies one might want to monitor.
@@ -27,7 +27,7 @@ Aggregation operations like SUM are commonly seen in database contexts.
 When considering an example like a monthly spending limit for a credit card it becomes clear how aggregations can be useful in policy monitoring.
 
 
-\subsection{MonPoly}
+\section{MonPoly}
 MonPoly \cite{Basin2017} is a policy monitoring tool written in OCaml that supports MFOTL with aggregations and in its newest iterations it also has support for MFODL.
 MonPoly can monitor a fragment of MFOTL/MFODL where all future operators must be bounded.
 One major exception to that rule is an (implicit) always operator around the desired policy.
@@ -72,7 +72,7 @@ IMPLIES
 While MonPoly cannot actually monitor this formula directly, it can monitor the negation of this formula.
 For this on can use the \texttt{-negate} flag when running MonPoly.
 
-\subsection{Time Series Databases}
+\section{Time Series Databases}
 
 Time series databases are a class of databases optimized for timestamped data.
 For example, they optimize for data retrieval within a certain time range.
