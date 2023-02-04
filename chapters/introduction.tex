@@ -20,7 +20,7 @@ MonPoly \cite{Basin2017} is a tool for such runtime monitoring.
 It can perform both online and offline monitoring.
 For online monitoring it accepts new events via standard input.
 For offline monitoring it can read a timestamped log file that was generated during the runtime of a system.
-It uses Metric First-Order Temporal Logic (MFOTL) \cite{Basin2008, Basin2015, Chomicki1995} as a formal specification language, which we will introduce in the background section.
+It uses Metric First-Order Temporal Logic (MFOTL) \cite{Basin2008, Basin2015, Chomicki1995} as a formal specification language, which we will introduce in the background chapter.
 
 MonPoly in its current state has some limitations that we want to improve.
 For one, online monitoring can not easily be done on a different machine from which the system is running on.
@@ -40,8 +40,9 @@ Further there is no built-in way to update the monitored policy.
 We aim to offer a first method for policy changes with minimal overhead in time and compute power.
 
 We improve MonPoly in these aspects by building a wrapper that connects it with a database and also provides a new, more web friendly, interface to MonPoly.
-
-% TODO talk about integrating logging and monitor into single tool
+It has always been possible to use a database for logging purposes in addition to MonPoly.
+We integrate the logging and monitoring functionality into a single tool.
+This reduces potential redundancies and gives us more flexibility on the monitoring side.
 
 MonPoly works with timestamped and tabular data.
 We make use of this fact for the choice of database.
@@ -52,22 +53,15 @@ We looked at a few different relational time series databases.
 In the end we opted for QuestDB \cite{questdb}.
 
 \section{Our Approach}
-
-\section{Contributions}
 We extend MonPoly with a web based wrapper written in Python using Flask \cite{Flask}.
 This wrapper provides a REST API \cite{Fielding2000} to MonPoly.
-Packaging MonPoly as a web app and offering a new API that offers greater flexibility in how MonPoly can be used.
-
-Through this wrapper we connect MonPoly to a database.
-The addition of a database gives us more options in terms of data portability.
-The state of the database is consistent with that of the monitor.
+The wrapper accepts incoming events and manages both the monitoring and logging to the database.
+We aim for a consistent state between the database and the monitor.
+Consistent here means that an event is stored in the database if and only if it has been properly processed by the monitor.
 
 The database connection allows us to stop MonPoly on one system and resume the monitoring on a different system, by querying the database.
-We make use of relative intervals \cite{Basin2016} to get a good over approximation of the data needed to continue monitoring a specific formula.
 
-We use the database to offer a first version of a policy change by stopping the monitor and starting a new one with the events within the relative interval of the new policy already loaded.
-
-Finally we have made a few additions to MonPoly itself that were needed for our wrapper.
+To facilitate some functions of the wrapper we have added some extensions to MonPoly itself.
 We added flags to MonPoly to print the schema of a given signature in SQL as well as JSON format.
 One of our aims was fault tolerance and for this we added some options to keep that would keep the monitor running instead of exiting when encountering certain issues.
 For the policy change we need to potentially reload a lot of events into the monitor.
@@ -76,4 +70,18 @@ Previously the monitor would either read a file and then stop or continuously re
 Another addition are capabilities to get the relative interval of a MFOTL formula and also to get the relative intervals of predicates in a formula.
 We have begun work on a different method of doing a policy change by changing only parts of a formula while MonPoly keeps running and can keep the state of the formula parts that are unchanged.
 
+
+\section{Contributions}
+We package MonPoly as a web app and add a new API that offers greater flexibility in how MonPoly can be used.
+Through this wrapper we connect MonPoly to a database.
+The addition of a database gives us more options in terms of data portability.
+
+We make use of relative intervals \cite{Basin2016} to get a good over approximation of the data needed to continue monitoring a specific formula.
+
+With the database we can offer a first version of a policy change by stopping the monitor and starting a new instance with the events within the relative interval of the new policy already loaded.
+
+The code base of the wrapper is in a GitLab repository \cite{git-wrapper}.
+The repository contains over 1300 lines of Python code.
+Our extended MonPoly is a branch of the development version of MonPoly on BitBucket \cite{git-monpoly-branch}.
+We have added over 500 lines of code to MonPoly.
 
