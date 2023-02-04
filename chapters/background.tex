@@ -8,21 +8,21 @@ It combines First Order Logic (FOL) with metric temporal operators.
 FOL provides us with common logic operators like $\land$ ("and"), $\lor$ ("or"), and $\neg$ ("not") as well as quantifiers $\forall$ ("for all") and $\exists$ ("exists").
 The metric temporal operators in MFOTL are $\Until_I$ ("until"), $\Since_I$ ("since"), $\Previous_I$ ("previous"), and $\Next_I$ ("next").
 These operators can be used to construct further syntactic sugar operators such as $\Once_I$ ("once"), $\Eventually_I$ ("eventually"), $\Always_I$ ("always"), and $\Historically_I$ ("historically").
-See Basin et al. 2015 \cite{Basin2015} for the concrete derivations of these additional operators.
+See Basin et al. \cite{Basin2015} for the concrete derivations of these additional operators.
 The metric aspect of these operators is the interval $I$ they are bound by.
 This interval denotes a time frame in which the formula needs to be satisfied.
 
-Basin et al. 2008 \cite{Basin2008} define the syntax and semantics of MFOTL.
+Basin et al. \cite{Basin2008} define the syntax and semantics of MFOTL.
 
 
 Metric First-Order \textit{Dynamic} Logic (MFODL) \cite{Basin2020} is an even more expressive specification language than MFOTL.
 MFODL introduces the notion of regular expressions.
-For an exact definition of these regular expressions and the two new operators they introduce see figure 4 of Basin et al. 2020 \cite{Basin2020}.
+For an exact definition of these regular expressions and the two new operators they introduce see figure 4 of Basin et al. \cite{Basin2020}.
 Similarly to how $\Once_I$, $\Eventually_I$, $\Always$, and $\Historically$ can be derived from the four core operators $\Until_I$, $\Since_I$, $\Previous_I$, and $\Next_I$, these core operators could theoretically be replaced by the two new regular expression operators.
-The exact conversion can also be seen in Basin et al. 2020 \cite{Basin2020}.
+The exact conversion can also be seen in Basin et al. \cite{Basin2020}.
 In practice, it is often useful to keep the basic temporal operators as we can apply specialized optimizations to them that cannot be done with regular expressions.
 
-Basin et al. 2015 \cite{Basin2015aggregations} extends MFOTL with aggregations.
+Basin et al. \cite{Basin2015aggregations} extends MFOTL with aggregations.
 Aggregation operations like SUM are commonly seen in database contexts.
 When considering an example like a monthly spending limit for a credit card it becomes clear how aggregations can be useful in policy monitoring.
 
