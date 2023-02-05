@@ -1,30 +1,164 @@
 \chapter{Background}
 
-\section{Metric First-Order Temporal Logic}
+\section{Metric First-Order Temporal and Dynamic Logic}
 As mentioned in the introduction, Metric First-Order Temporal Logic (MFOTL) \cite{Basin2008, Basin2015, Chomicki1995} is used as a policy specification language by MonPoly.
 Here we give a quick overview of MFOTL.
 MFOTL is well suited to express a variety of policies one might want to monitor.
 It combines First Order Logic (FOL) with metric temporal operators.
-FOL provides us with common logic operators like $\land$ ("and"), $\lor$ ("or"), and $\neg$ ("not") as well as quantifiers $\forall$ ("for all") and $\exists$ ("exists").
-The metric temporal operators in MFOTL are $\Until_I$ ("until"), $\Since_I$ ("since"), $\Previous_I$ ("previous"), and $\Next_I$ ("next").
-These operators can be used to construct further syntactic sugar operators such as $\Once_I$ ("once"), $\Eventually_I$ ("eventually"), $\Always_I$ ("always"), and $\Historically_I$ ("historically").
-See Basin et al. \cite{Basin2015} for the concrete derivations of these additional operators.
 The metric aspect of these operators is the interval $I$ they are bound by.
 This interval denotes a time frame in which the formula needs to be satisfied.
-
-Basin et al. \cite{Basin2008} define the syntax and semantics of MFOTL.
 
 
 Metric First-Order \textit{Dynamic} Logic (MFODL) \cite{Basin2020} is an even more expressive specification language than MFOTL.
 MFODL introduces the notion of regular expressions.
-For an exact definition of these regular expressions and the two new operators they introduce see figure 4 of Basin et al. \cite{Basin2020}.
-Similarly to how $\Once_I$, $\Eventually_I$, $\Always$, and $\Historically$ can be derived from the four core operators $\Until_I$, $\Since_I$, $\Previous_I$, and $\Next_I$, these core operators could theoretically be replaced by the two new regular expression operators.
-The exact conversion can also be seen in Basin et al. \cite{Basin2020}.
+It is more general than MFOTL and in theory the temporal operators from MFOTL could be replaced by the two more powerful operators introduced by MFODL.
 In practice, it is often useful to keep the basic temporal operators as we can apply specialized optimizations to them that cannot be done with regular expressions.
 
 Basin et al. \cite{Basin2015aggregations} extends MFOTL with aggregations.
 Aggregation operations like SUM are commonly seen in database contexts.
 When considering an example like a monthly spending limit for a credit card it becomes clear how aggregations can be useful in policy monitoring.
+
+\subsection{Syntax and Semantics}
+Let's recall the syntax and semantics of MFOTL \cite{Basin2008,Basin2015,Schneider2019} as well as MFODL \cite{Basin2020}.
+Like Basin et al. \cite{Basin2015} we let $\mathbb{I}$ be the set of nonempty intervals over $\mathbb{N}$.
+We use the common interval definition with round brackets for open intervals and square brackets for closed ones, e.g. $[a,b) := \{x \in \mathbb{N} \mid a \leq x < b\}$.
+A signature $S$, as defined by Basin et al. \cite{Basin2015}, is a tuple $(C,R,\iota)$.
+$C$ is a finite set of constant symbols, $R$ is a finite set of predicates, and $\iota : R \to C$ is a function that assigns each predicate $r \in R$ an arity $\iota(r)$.
+$C$ and $R$ are disjoint, i.e. $C \cap R = \emptyset$.
+Let $S = (C,R,\iota)$ be a signature and $V$ a finite set of variables with $V \cap (C \cup R) = \emptyset$.
+Now we have enough information to restate the definition of an MFOTL formula (Definition 2.1 in Basin et al. \cite{Basin2015}).
+Let $\circ$ be any ordering relation over $V \cup C$, i.e. $\approx$, $\prec$, $\preceq$.
+Basin et al. \cite{Basin2015} only included the equality relation, the other comparisons were added in \cite{Basin2020}.
+
+\renewcommand{\labelenumi}{(\roman{enumi})}
+\begin{definition}
+    The MFOTL formulas over $S$ are inductively defined in the following way.
+    \begin{enumerate}
+        \item For $t,t' \in V \cup C$, $t \circ t'$ is a formula.
+        \item For $r \in R$ and $t_1, t_2, \dots, t_{\iota(r)} \in V \cup C$, $r(t_1,t_2,\dots,t_{\iota(r)})$ is a formula.
+        \item For $x \in V$, if $\phi$ and $\psi$ are formulas then $(\neg \phi),(\phi \lor \psi),\text{ and }(\exists x . \phi)$ are formulas.
+        \item For $I \in \mathbb{I}$, if $\phi$ and $\psi$ are formulas then $(\Previous{I} \phi), (\Next{I} \phi), (\phi \Since{I} \psi), \text{ and }(\phi \Until{I} \psi)$ are formulas.
+    \end{enumerate}
+\end{definition}
+
+The definition omits common first order logical operators $\land$ ("and") and $\forall$ ("for all").
+These can be constructed as syntactic sugar from the three FOL operators negation, or, and the exists quantifier.
+The metric temporal operators in MFOTL are $\Until{I}$ ("until"), $\Since{I}$ ("since"), $\Previous{I}$ ("previous"), and $\Next{I}$ ("next").
+Similarly to FOL the four MFOTL operators can also be used to construct other convenient operators such as $\Once{I}$ ("once"), $\Eventually{I}$ ("eventually"), $\Always{I}$ ("always"), and $\Historically{I}$ ("historically").
+See Basin et al. \cite{Basin2015} for the concrete derivations of these additional operators.
+
+The subscript $I$ of the temporal operators specifies the time interval in the past or the future in which a formula must be satisfied.
+For the evaluation of a formula Basin et al. \cite{Basin2015} introduces the notion of a structure $\mathcal{D}$ over a signature $S=(C,R,\iota)$.
+It consists of the domain $| \mathcal{D} | \neq \emptyset$ and interpretations $c^\mathcal{D} \in |\mathcal{D}|$ and $r^\mathcal{D} \in |\mathcal{D}|$, for each $c \in C$ and $r \in R$.
+Basin et al. \cite{Basin2015} further defines a temporal structure as a pair $(\bar{\mathcal{D}}, \bar{\tau})$ whith $\bar{\mathcal{D}} = (\mathcal{D}_0, \mathcal{D}_1, \dots)$ is a sequence of structures over $S$ and $\bar{\tau} = (\tau_0, \tau_1, \dots)$ is a sequence of non-negative integers (\textit{time stamps}) with the following 3 properties.
+\renewcommand{\labelenumi}{\arabic{enumi}.}
+\begin{enumerate}
+    \item The sequence is monotonically increasing, i.e. $\forall i . \tau_i \leq \tau_{i+1}$. Moreover $\bar{\tau}$ makes progress for every $\tau \in \mathbb{N}$ there is some $i$ such that $\tau < \tau_i$. 
+    \item $\bar{\mathcal{D}}$ has constant domains, that is, for all $i \geq 0$, $|\mathcal{D}_i| = |\mathcal{D}_{i+1}|$.
+    \item Each constant symbol $c \in C$ has a rigid interpretation, that is, for all $i \geq 0$, $c^{\mathcal{D}_i} = c^{\mathcal{D}_{i+1}}$.
+\end{enumerate}
+The indices in the sequences $\bar{\mathcal{D}}$ and $\bar{\tau}$ are called \textit{time points}.
+It is important to high light the difference between \textit{time stamps} and \textit{time points}.
+Both are integers, but in our sequences $\bar{\mathcal{D}}$ and $\bar{\tau}$ time points are by their definition as indices strictly increasing and their is no "missing" time point between two others.
+On the other hand it is possible that succeeding time points have identical time stamps or that time stamps jump by more than one from time point to time point.
+Since the domain of the structures $\mathcal{D}_i$ and the valuation of constants $c \in C$ do not change they are denoted as $|\bar{\mathcal{D}}|$ and $c^{\bar{\mathcal{D}}}$ respectively.
+Basin et al. defines a \textit{valuation} as a mapping $v : V \to |\bar{\mathcal{D}}|$.
+And for a variable vector $\bar{x} = (x_1,\dots,x_n)$, and $\bar{d}=(d_1,\dots,d_n) \in |\bar{\mathcal{D}}$ it defines the notation $v[\bar{x} \mapsto \bar{d}]$ for the valuation that maps $x_i$ to $d_i$ for $1 \leq i \leq n$.
+Further it uses a notational hack to also apply a valuation $v$ to constant symbols $c \in C$ where $v(c) = c^{\bar{\mathcal{D}}}$.
+For convenience we restate definition 2.2 from Basin et al. \cite{Basin2015}.
+Since we changed the definition of a formula to include ordering relations ($\prec, \preceq$) instead of only equality ($\approx$), we append this definition to allow for that.
+These additions are also in figure 1 of Basin et. al \cite{Basin2020}.
+
+\begin{definition}
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$ be a temporal structure over the signature $S = (C,R,\iota)$, with $\bar{\mathcal{D}} = (\mathcal{D}_0,\mathcal{D}_1,\dots)$ and $\bar{\tau} = (\tau_0, \tau_1, \dots)$, $\phi$ a formula over $S$, $v$ a valuation, and $i \in \mathbb{N}$.
+    We define the relation $(\bar{\mathcal{D}},\bar{\tau},v,i) \models \phi$ inductively as follows.
+    \begin{alignat*}{3}
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models t \approx t'  
+            &&\text{iff } && v(t) = v(t') \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models \prec t \approx t'  
+            &&\text{iff } && v(t) < v(t') \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models \preceq t \approx t'  
+            &&\text{iff } && v(t) \leq v(t') \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models r(t_1,\dots,t_{\iota(r)})  
+            \qquad
+            &&\text{iff } && (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\mathcal{D}_i} \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\neg \psi) 
+            &&\text{iff } && (\bar{\mathcal{D}},\bar{\tau},v,i) \not\models \psi \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\psi \lor \psi') 
+            &&\text{if } && (\bar{\mathcal{D}},\bar{\tau},v,i) \models \psi 
+            \text{ or } (\bar{\mathcal{D}},\bar{\tau},v,i) \models \psi' \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\exists x. \psi) 
+            &&\text{iff } && (\bar{\mathcal{D}},\bar{\tau},v[x \mapsto d],i) \models \psi 
+            \text{ for some } d \in |\bar{\mathcal{D}}| \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\Previous{I} \psi) 
+            &&\text{iff } && i > 0, \tau_i - \tau_{i+1} \in I, \text{ and } (\bar{\mathcal{D}}, \bar{\tau}, v, i-1) \models \psi \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\Next{I} \psi)
+            &&\text{iff } && \tau_{i+1} - \tau_i \in I \text{ and } (\bar{\mathcal{D}},\bar{\tau},v,i+1) \models \psi \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\psi \Since{I} \psi')
+            &&\text{iff} && \text{for some } j \leq i, \tau_i - \tau_j \in I, (\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \psi' \text{ and } \\
+            &&&&&(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi \text{ for all } k \in \mathbb{N} \text{ with } j < k \leq i \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\psi \Until{I} \psi')
+            &&\text{iff } && \text{for some } j \geq i, \tau_j - \tau_i \in I, (\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \psi' \text{ and } \\
+            &&&&&(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi \text{ for all } k \in \mathbb{N} \text{ with } i \leq k < j \\
+    \end{alignat*}
+\end{definition}
+
+Anologous to the definition of MFOTL formulas we now give the definition of an MFODL formula.
+The definition is based on figure 4 of Basin et al. \cite{Basin2020}, but in a notation closer to the one we already used for MFOTL formulas.
+For MFODL formulas we first have to define regular expressions, as MFODL formulas depend on them.
+\renewcommand{\labelenumi}{(\roman{enumi})}
+\begin{definition}
+    The MFODL regular expressions are defined in the following way:
+    \begin{enumerate}
+        \item If $k \in \mathbb{N}$ then $\star^k$ is a regular expression.
+        \item If $\phi$ is a formula then $(\phi ?)$ is a regular expression.
+        \item If $\rho$ is a regular expression then $(\rho^*)$ is a regular expression.
+        \item If $\rho$ and $\sigma$ are regular expressions then $(\rho + \sigma)$ and $(\rho \cdot \sigma)$ are regular expressions.
+    \end{enumerate}
+\end{definition}
+With this we extend the definition of MFOTL formulas to include MFODL formulas.
+\begin{definition}
+    The MFODL formulas over $S$ are inductively defined in the following way.
+    \begin{enumerate}
+        \item MFOTL formulas are also MFOTL formulas
+        \item For $I \in \mathbb{I}$, if $\rho$ is a regular expression then $(\Pregex{I} \rho)$ and $(\Fregex{I} \rho)$ are formulas.
+    \end{enumerate}
+\end{definition}
+For the evaluation of an MFODL formula we first need to define how regular expressions get evaluated.
+The definition is originally given through the \texttt{match} function in figure 4 of Basin et al. \cite{Basin2020}.
+We formulate the definition that is more in line with the mathematical notation we used this far.
+\begin{definition}
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$ be a temporal structure over the signature $S = (C,R,\iota)$, with $\bar{\mathcal{D}} = (\mathcal{D}_0,\mathcal{D}_1,\dots)$ and $\bar{\tau} = (\tau_0, \tau_1, \dots)$, $\phi$ a formula over $S$, $v$ a valuation, and $i,j \in \mathbb{N}$.
+    \begin{alignat*}{3}
+        &(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \star^k
+            &&\text{iff } && i = j + k\\
+        &(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \phi ?
+            &&\text{iff } && (\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \phi \text{ and } i = j\\
+        &(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \rho + \sigma \qquad
+            &&\text{iff } && (\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \rho \text{ or }(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \sigma \\
+        &(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \rho \cdot \sigma \qquad
+            &&\text{iff } && \text{ for some } k \in \mathbb{N}, (\bar{\mathcal{D}}, \bar{\tau}, i, k) \models \rho \text{ and }(\bar{\mathcal{D}}, \bar{\tau}, k, j) \models \sigma \\
+        &(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \rho^*
+            &&\text{iff } && \text{ for some } l \in \mathbb{N}, o_1,\dots,o_l \in \mathbb{N}, (\bar{\mathcal{D}}, \bar{\tau}, i, o_1) \models \rho \text{ and } \dots  \\
+            &&&&&\text{ and } (\bar{\mathcal{D}}, \bar{\tau}, o_l, j) \models \rho \\
+    \end{alignat*}
+    
+\end{definition}
+With the help of this definition we can now define the evaluation of MFODL formulas which is also given in figure 4 of Basin et al. \cite{Basin2020} through the \texttt{sat} function.
+The trace $\sigma$ in the \texttt{sat} function is simply our temporal structure $(\bar{\mathcal{D}},\bar{\tau})$.
+The data list $v$ is the valuation mapping.
+And $i$ specifies the current time point in both notations.
+\begin{definition}
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$ be a temporal structure over the signature $S = (C,R,\iota)$, with $\bar{\mathcal{D}} = (\mathcal{D}_0,\mathcal{D}_1,\dots)$ and $\bar{\tau} = (\tau_0, \tau_1, \dots)$, $\phi$ a formula over $S$, $v$ a valuation, and $i \in \mathbb{N}$.
+    We define the relation $(\bar{\mathcal{D}},\bar{\tau},v,i) \models \phi$ inductively as follows.
+    \begin{alignat*}{3}
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models \Pregex{I} \rho
+            &&\text{ iff } && \text{for some } j \leq i, \tau_i - \tau_j \in I \text{ and }(\bar{\mathcal{D}}, \bar{\tau}, j, i) \models \rho \\
+        &(\bar{\mathcal{D}},\bar{\tau},v,i) \models \Fregex{I} \rho
+            &&\text{ iff } && \text{for some } j \geq i, \tau_j - \tau_i \in I \text{ and }(\bar{\mathcal{D}}, \bar{\tau}, i, j) \models \rho \\
+    \end{alignat*}
+    
+\end{definition}
 
 
 \section{MonPoly}
@@ -51,12 +185,12 @@ The last two events get triggered when a user either grants or revokes permissio
 Let's now define the policy in a formal manner.
 \begin{align*}
     \Always (\texttt{loc\_accessed(i, "advertising")}
-    \implies (\Once_{[0,\infty)} &\texttt{perm\_granted(i)} \\
-         \land  \neg (\texttt{perm\_revoked(i)} \Since_{[0,\infty)} 
+    \implies (\Once{[0,\infty)} &\texttt{perm\_granted(i)} \\
+         \land  \neg (\texttt{perm\_revoked(i)} \Since{[0,\infty)} 
             &\texttt{perm\_granted(i)})))
 \end{align*}
 
-For MonPoly we first get rid of the surrounding $\Always$, because MonPoly implicitly adds an always-operator around any policy.
+For MonPoly we first get rid of the surrounding $\Always{}$, because MonPoly implicitly adds an always-operator around any policy.
 The remaining formula in MonPoly syntax is the following:
 
 \begin{verbatim}
