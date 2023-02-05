@@ -1,24 +1,26 @@
-\newcommand{\Until}{\,\mathcal{U}\,}
-\newcommand{\Since}{\,\mathcal{S}\,}
-\newcommand{\Next}{\tikz\draw[] (0,0) circle (.8ex);}
+\newcommand*{\Until}[1]{\,\mathcal{U}_{#1}\,}
+\newcommand*{\Since}[1]{\,\mathcal{S}_{#1}\,}
+\newcommand*{\Next}[1]{\tikz\draw[] (0,0) circle (.8ex);_{#1}}
 % \newcommand{\Next}{\Circle}
-\newcommand{\Previous}{\tikz\draw[fill] (0,0) circle (.8ex);}
+\newcommand*{\Previous}[1]{\tikz\draw[fill] (0,0) circle (.8ex);_{#1}}
 % \newcommand{\Previous}{\Circle[f]}
-\newcommand{\Eventually}{\lozenge}
-\newcommand{\Once}{\blacklozenge}
-\newcommand{\Always}{\square}
-\newcommand{\Historically}{\blacksquare}
-\newcommand{\Fregex}{\vartriangleright}
-\newcommand{\Pregex}{\blacktriangleleft}
+\newcommand*{\Eventually}[1]{\lozenge_{#1}}
+\newcommand*{\Once}[1]{\blacklozenge_{#1}}
+\newcommand*{\Always}[1]{\square_{#1}}
+\newcommand*{\Historically}[1]{\blacksquare_{#1}}
+\newcommand*{\Fregex}[1]{\vartriangleright_{#1}}
+\newcommand*{\Pregex}[1]{\blacktriangleleft_{#1}}
 
-\newcommand{\RI}{\operatorname{RI}}
-\newcommand{\RIr}{\operatorname{RI}_{\text{reg}}}
-\newcommand{\ERI}{\operatorname{ERI}}
-\newcommand{\ERIr}{\operatorname{ERI}_{\text{reg}}}
+\newcommand*{\RI}{\operatorname{RI}}
+\newcommand*{\RIr}{\operatorname{RI}_{\text{reg}}}
+\newcommand*{\ERI}{\operatorname{ERI}}
+\newcommand*{\ERIr}{\operatorname{ERI}_{\text{reg}}}
 
-\newcommand{\Cupmerge}{\,\ddot{\Cup}\,}
-\newcommand{\Cupext}{\,\dot{\Cup}\,}
-\newcommand{\oplusext}{\,\dot{\oplus}\,}
+\newcommand*{\filter}{\operatorname{filter}}
+
+\newcommand*{\Cupmerge}{\,\ddot{\Cup}\,}
+\newcommand*{\Cupext}{\,\dot{\Cup}\,}
+\newcommand*{\oplusext}{\,\dot{\oplus}\,}
 
 \newcommand{\keys}{\operatorname{keys}}
 
