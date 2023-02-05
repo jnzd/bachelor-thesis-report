@@ -7,21 +7,21 @@ The operators $\oplus$ and $\Cup$ are defined the same way as in Basin et al. \c
 Let $I$ and $J$ be some arbitrary intervals then $I \oplus J := \{i+j \mid i \in I \text{ and } j \in J\}$ and $I \Cup J$ is the smallest interval containing all values in both $I$ and $J$.
 
 \begin{definition} 
-    The relative interval of the formula $\varphi$, $\RI(\varphi) \subseteq \mathbb{Z}$ is defined recuresively over the formula structure: 
+    The relative interval of the formula $\phi$, $\RI(\phi) \subseteq \mathbb{Z}$ is defined recuresively over the formula structure: 
     \begin{equation*}
-        \RI(\varphi) =
+        \RI(\phi) =
         \begin{cases}
-            \{0\}     & \text{if $\varphi$ is an an atomic formula,} \\ 
-            \RI(\psi) & \text{if $\varphi$ is of the form $\neg \psi$, 
+            \{0\}     & \text{if $\phi$ is an an atomic formula,} \\ 
+            \RI(\psi) & \text{if $\phi$ is of the form $\neg \psi$, 
                                 $\exists x.\psi$,} \\ &\text{or $\forall x.\psi$,} \\
-            \RI(\psi) \Cup \RI(\chi) & \text{if $\varphi$ is of the form $\psi \lor \chi, or
+            \RI(\psi) \Cup \RI(\chi) & \text{if $\phi$ is of the form $\psi \lor \chi, or
                                             \psi \land \chi$,} \\
-            (-b,0] \Cup ((-b,-a] \oplus \RI(\psi)) & \text{if $\varphi$ is of the form $\Previous{[a,b)}\psi$,} \\
-            [0,b) \Cup ([a,b) \oplus \RI(\psi)) & \text{if $\varphi$ is of the form $\Next{[a,b)}$,}\\
-            (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)) & \text{if $\varphi$ is of the form $\psi \Since{}_{[a,b)} \chi$,} \\
-            [0,b) \Cup ([0,b) \oplus \RI(\psi)) \Cup ([a,b) \oplus \RI(\chi)) & \text{if $\varphi$ is of the form $\psi \Until{[a,b)} \chi$,} \\
-            [0,b) \Cup ([0,b) \oplus \RIr(\rho)) & \text{if $\varphi$ is of the form $\Fregex{[a,b)} \rho$, and}\\
-            (-b,0] \Cup ((-b,0] \oplus \RIr(\rho)) & \text{if $\varphi$ is of the form $\Pregex{[a,b)} \rho$.}\\
+            (-b,0] \Cup ((-b,-a] \oplus \RI(\psi)) & \text{if $\phi$ is of the form $\Previous{[a,b)}\psi$,} \\
+            [0,b) \Cup ([a,b) \oplus \RI(\psi)) & \text{if $\phi$ is of the form $\Next{[a,b)}$,}\\
+            (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)) & \text{if $\phi$ is of the form $\psi \Since{}_{[a,b)} \chi$,} \\
+            [0,b) \Cup ([0,b) \oplus \RI(\psi)) \Cup ([a,b) \oplus \RI(\chi)) & \text{if $\phi$ is of the form $\psi \Until{[a,b)} \chi$,} \\
+            [0,b) \Cup ([0,b) \oplus \RIr(\rho)) & \text{if $\phi$ is of the form $\Fregex{[a,b)} \rho$, and}\\
+            (-b,0] \Cup ((-b,0] \oplus \RIr(\rho)) & \text{if $\phi$ is of the form $\Pregex{[a,b)} \rho$.}\\
         \end{cases}
     \end{equation*}
 \end{definition}
@@ -34,7 +34,7 @@ We recursively define the relative interval of regular expressions as seen in Ba
         \RIr(\rho) =
         \begin{cases}
             \{0\} & \text{if $\rho$ is of the form $\star^k$,} \\
-            \RI(\varphi) & \text{if $\rho$ is of the form $\varphi?$,} \\
+            \RI(\phi) & \text{if $\rho$ is of the form $\phi?$,} \\
             \RIr(\sigma) \Cup \RIr(\tau) & \text{if $\rho$ is of the form $\sigma + \tau$ or $\sigma \cdot \tau$, and} \\
             \RIr(\sigma) & \text{if $\rho$ is of the form $\sigma^*$.}
 
@@ -42,38 +42,57 @@ We recursively define the relative interval of regular expressions as seen in Ba
     \end{equation*}
 \end{definition}
 
-\begin{definition}
-    We call filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to an interval $[0,a]$ at time point $j$ the trace 
-    \begin{equation*}
-        \filter(\sigma, [0,a], j) = \sigma' = ((\tau_k,D_k), ..., (\tau_j,D_j))
-    \end{equation*}
-    where $k$ is the largest index for which $\tau_i - \tau_k < a$.
-\end{definition}
-(N.B. You need your semantics to be defined on finite traces also!)
-
-\begin{theorem}
-    For all  $\sigma, v, i$:
-    \begin{equation*}
-        \sigma, v, i |= \varphi => filter(\sigma, \RI(\phi), i), v, i |= \varphi
-    \end{equation*}
-\end{theorem}
 
 \subsection{Correctness}
 % TODO
-Basin et al. \cite{Basin2016} provides an intuition for why the definition of $\RI$ is correct for the MFOTL operators.
-Here we provide the same for the added MFODL \cite{Basin2020} operators and the regular expressions.
+Basin et al. \cite{Basin2016} provides an intuition for why the definition of $\RI$ makes sense.
+We aim provide a more formal proof of correctness.
+\begin{definition}
+    We call filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to an interval $I$ at time point $j$ the trace 
+    \begin{equation*}
+        \filter(\sigma, I, j) = \sigma' = ((\tau_k,D_k), ..., (\tau_j,D_j))
+    \end{equation*}
+    where $k$ is the largest index for which $\tau_j - \tau_k \in I \cap (-\infty,0]$.
+    % where $k$ is the largest index for which $\tau_j - \tau_k \in I$.
+\end{definition}
+% TODO (N.B. You need your semantics to be defined on finite traces also!)
+The intuition for why we intersect the interval $I$ with all negative numbers, is that this limits the range of possible time points to ones that are in the past from the perspective of $\tau_j$.
+This is sensible, because the set of future events should be empty anyways and we can thus disregard it directly.
+% TODO remove this in document comment
+\textit{comment: this restriction isn't strictly necessary, it might just over complicate things}.
+\begin{theorem}
+    For all  $\sigma, v, i$:
+    \begin{equation*}
+        (\sigma, v, i) \models \phi 
+        \Leftrightarrow (\filter(\sigma, \RI(\phi), i), v, i) \models \phi
+    \end{equation*}
+\end{theorem}
+We prove this theorem by induction over the formula structure of MFOTL/MFODL as defined in the background chapter.
+Our induction hypothesis is that the theorem holds for any subformulas.
+We then show that the theorem holds for any formula $\phi$.
+Only formulas of the structures $(\Previous{I} \psi),(\Next{I} \psi), (\psi \Since{I} \psi'), (\psi \Until{I} \psi'), (\Pregex{I} \rho), \text{ and } (\Fregex{I} \rho)$ depend on the trace $\sigma$.
+Therefore the theorem holds trivially if $\phi$ has any other structure (first order logic and relations).
 
-The definition of relative intervals is correct if any formula $\varphi$ evaluated on a trace $\sigma$ has the same truth value as evaluated on a trace $\sigma'$ that is a filtered version of $\sigma$ based on $\RI(\varphi)$.
-Let $\RI(\varphi) = [a,b)$ where $a,b \in \mathbb{Z}, \, a \leq 0, \, b > 0$.
-Given that no future events can be extracted from a trace as they have not happened yet, the extracted trace $\sigma'$ only contains time points with time stamps that are in the interval $[a,0]$.
-Formally $\sigma' = \{x \mid x \in \sigma \text{ and } x.ts \in [a,0]\}$, where $x.ts$ denotes the time stamp of $x$.
+We start with $\phi = (\Previous{[a,b)} \psi)$.
+There are two cases to consider.
+Either the left hand side (LHS) is true, i.e. ($\sigma, v, i \models \phi$) or it is not true, i.e. ($\sigma, v, i \not\models \phi$).
+We first consider the LHS to be true, that is $\phi$ evaluates to true at the time point $i$ with the valuation mapping $v$ and the trace $\sigma$.
+The relative interval of $\phi=(\Previous{[a,b)} \psi)$ is defined as $\RI(\phi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))$.
+By our induction hypothesis $ (\sigma, v, i) \models \psi \Leftrightarrow (\filter(\sigma, \RI(\psi), i), v, i) \models \psi $ holds.
 
-The future match operator $\Fregex{I} \rho$ depends on the relative interval of $\rho$ shifted by the interval $I$.
-Similarly the past match operator $\Pregex{I} \rho$ depends on the relative interval of $\rho$ shifted by the inverted interval $I$.
-The interpretation of the relative intervals for regular expressions is a bit different from that of a formula.
-Its relevance is the amount that the "parent" interval of a past or future match operator needs to be shifted by.
-The wildcard operator $\star^k$ doesn't have any interval information attached.
-The parameter $k$ refers to a number of timepoints, but not directly to time stamps.
-The test operator $\varphi ?$ is more involved.
-It evaluates a formula $\varphi$ which of course has a regular relative interval.
-Depending on which match operator is used we want to evaluate $\varphi$ with any starting point inside the specified past or future interval.
+
+
+% The definition of relative intervals is correct if any formula $\phi$ evaluated on a trace $\sigma$ has the same truth value as evaluated on a trace $\sigma'$ that is a filtered version of $\sigma$ based on $\RI(\phi)$.
+% Let $\RI(\phi) = [a,b)$ where $a,b \in \mathbb{Z}, \, a \leq 0, \, b > 0$.
+% Given that no future events can be extracted from a trace as they have not happened yet, the extracted trace $\sigma'$ only contains time points with time stamps that are in the interval $[a,0]$.
+% Formally $\sigma' = \{x \mid x \in \sigma \text{ and } x.ts \in [a,0]\}$, where $x.ts$ denotes the time stamp of $x$.
+
+% The future match operator $\Fregex{I} \rho$ depends on the relative interval of $\rho$ shifted by the interval $I$.
+% Similarly the past match operator $\Pregex{I} \rho$ depends on the relative interval of $\rho$ shifted by the inverted interval $I$.
+% The interpretation of the relative intervals for regular expressions is a bit different from that of a formula.
+% Its relevance is the amount that the "parent" interval of a past or future match operator needs to be shifted by.
+% The wildcard operator $\star^k$ doesn't have any interval information attached.
+% The parameter $k$ refers to a number of timepoints, but not directly to time stamps.
+% The test operator $\phi ?$ is more involved.
+% It evaluates a formula $\phi$ which of course has a regular relative interval.
+% Depending on which match operator is used we want to evaluate $\phi$ with any starting point inside the specified past or future interval.
