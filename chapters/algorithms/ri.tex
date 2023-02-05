@@ -79,6 +79,17 @@ Either the left hand side (LHS) is true, i.e. ($\sigma, v, i \models \phi$) or i
 We first consider the LHS to be true, that is $\phi$ evaluates to true at the time point $i$ with the valuation mapping $v$ and the trace $\sigma$.
 The relative interval of $\phi=(\Previous{[a,b)} \psi)$ is defined as $\RI(\phi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))$.
 By our induction hypothesis $ (\sigma, v, i) \models \psi \Leftrightarrow (\filter(\sigma, \RI(\psi), i), v, i) \models \psi $ holds.
+By definition $(\filter(\sigma, \RI(\phi), i), v, i) \models \phi$ holds if and only if $i > 0, \tau_i - \tau_{i+1} \in [a,b)$ and $(\sigma, v, i-1) \models \psi$.
+From the LHS holding we know that $i>0$.
+We also know that for the LHS to be evaluated to true, $(\sigma, v, i-1) \models \psi$ must also hold.
+And by the induction hypothesis we therefore get $(\filter(\sigma, \RI(\psi), i), v, i) \models \psi$.
+This means the final condition we must show is that for the filtered trace $\sigma'$, $\tau_i - \tau_{i+1} \in [a,b)$.
+So in other words we must show that the two time points $i$ and $i+1$ with their respective time stamps $\tau_i$ and $\tau_{i+1}$ are within the relative interval of $\phi$.
+
+\textit{comment: is the numbering of time points generally without gaps?}
+
+If we go with the definition of filtering only applying to the past we can essentially disregard the future operators next and future match.
+
 
 
 
