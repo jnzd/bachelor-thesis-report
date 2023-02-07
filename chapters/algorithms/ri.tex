@@ -7,6 +7,7 @@ The operators $\oplus$ and $\Cup$ are defined the same way as in Basin et al. \c
 Let $I$ and $J$ be some arbitrary intervals then $I \oplus J := \{i+j \mid i \in I \text{ and } j \in J\}$ and $I \Cup J$ is the smallest interval containing all values in both $I$ and $J$.
 
 \begin{definition} 
+    \label{def:rel-int}
     The relative interval of the formula $\phi$, $\RI(\phi) \subseteq \mathbb{Z}$ is defined recuresively over the formula structure: 
     \begin{equation*}
         \RI(\phi) =
@@ -29,6 +30,7 @@ Let $I$ and $J$ be some arbitrary intervals then $I \oplus J := \{i+j \mid i \in
 We recursively define the relative interval of regular expressions as seen in Basin et al. \cite{Basin2020} in the following way.
 
 \begin{definition}
+    \label{def:rel-int-reg}
     The relative interval of the regular expression $\rho$, $\RIr(\rho) \subseteq \mathbb{Z}$ is defined recursively over the structure of the regular expression:
     \begin{equation*}
         \RIr(\rho) =
@@ -45,50 +47,229 @@ We recursively define the relative interval of regular expressions as seen in Ba
 
 \subsection{Correctness}
 % TODO
-Basin et al. \cite{Basin2016} provides an intuition for why the definition of $\RI$ makes sense.
-We aim provide a more formal proof of correctness.
+% Basin et al. \cite{Basin2016} provides an intuition for why the definition of $\RI$ makes sense.
+We want to show that it is sufficient to extract all time points with a time stamp in the relative interval $\RI(\phi)$ for a formula $\phi$ from a trace to evaluate $\phi$.
+Lemma A.4 in Basin et al. \cite{Basin2016} provides exactly this.
+The lemma says that the evaluation of a formula $\phi$ is the same on two different temporal structures (traces) for the time point with index $i$ in the first structure and the time point with index $i-c$ in the second structure if they ar $(RI(\phi),c,i)$-overlapping as defined by Definition A.4 in Basein et al. \cite{Basin2016}.
+
+For convenience we restate Lemma A.4 and the definitions it requires here.
+First we recall Definition A.2 from Basin et al. \cite{Basin2016}.
 \begin{definition}
-    We call filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to an interval $I$ at time point $j$ the trace 
-    \begin{equation*}
-        \filter(\sigma, I, j) = \sigma' = ((\tau_k,D_k), ..., (\tau_j,D_j))
-    \end{equation*}
-    where $k$ is the largest index for which $\tau_j - \tau_k \in I \cap (-\infty,0]$.
-    % where $k$ is the largest index for which $\tau_j - \tau_k \in I$.
+    \label{def:t-slice}
+    Let $T \subseteq \mathbb{Z}$ be an interval and $(\bar{\mathcal{D}}, \bar{\tau})$ a trace.
+    The T-slice of $(\bar{\mathcal{D}}, \bar{\tau})$ is the time slice $(\bar{\mathcal{D}'}, \bar{\tau}')$ of $(\bar{\mathcal{D}}, \bar{\tau})$, 
+        where $s: [0,l) \to \mathbb{N}$ is the function $s(i') = i' + c, l = |\{i \in \mathbb{N} \mid \tau_i \in T \}|$ and $c = \min\{i \in \mathbb{N} \mid \tau_i \in T \}$.
+    We also require that $\tau_l' \not\in T$ and $\mathcal{D}'_{i'} = \mathcal{D}_{s(i')}$, for all $i' \in [0,l)$.
 \end{definition}
-% TODO (N.B. You need your semantics to be defined on finite traces also!)
-The intuition for why we intersect the interval $I$ with all negative numbers, is that this limits the range of possible time points to ones that are in the past from the perspective of $\tau_j$.
-This is sensible, because the set of future events should be empty anyways and we can thus disregard it directly.
-% TODO remove this in document comment
-\textit{comment: this restriction isn't strictly necessary, it might just over complicate things}.
-\begin{theorem}
-    For all  $\sigma, v, i$:
-    \begin{equation*}
-        (\sigma, v, i) \models \phi 
-        \Leftrightarrow (\filter(\sigma, \RI(\phi), i), v, i) \models \phi
-    \end{equation*}
-\end{theorem}
-We prove this theorem by induction over the formula structure of MFOTL/MFODL as defined in the background chapter.
-Our induction hypothesis is that the theorem holds for any subformulas.
-We then show that the theorem holds for any formula $\phi$.
-Only formulas of the structures $(\Previous{I} \psi),(\Next{I} \psi), (\psi \Since{I} \psi'), (\psi \Until{I} \psi'), (\Pregex{I} \rho), \text{ and } (\Fregex{I} \rho)$ depend on the trace $\sigma$.
-Therefore the theorem holds trivially if $\phi$ has any other structure (first order logic and relations).
+We also need Definition A.4 from Basin et al. \cite{Basin2016}.
+\begin{definition}
+    \label{def:overlapping}
+    Let $I \subseteq \mathbb{Z}$ be an interval and $c,i \in \mathbb{N}$.
+    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(I,c,i)$-overlapping if the following conditions hold:
+    \renewcommand{\labelenumi}{\arabic{enumi}.}
+    \begin{enumerate}
+        \item $j \geq c, \mathcal{D}_j = \mathcal{D}'_{j-c},$ and $\tau_j = \tau'_{j-c},$ for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$.
+        \item $\mathcal{D}_{j'+c} = \mathcal{D}'_j,$ and $\tau_{j'+c} = \tau'_{j'},$ for all $j' \in \mathbb{N}$ with $\tau'_{j'}-\tau_i \in I$.
+    \end{enumerate}
+\end{definition}
+And finally Lemma A.4 itself.
+\begin{lemma}
+    \label{lem:ri-completness}
+    Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i) \models \phi$.
+\end{lemma}
 
-We start with $\phi = (\Previous{[a,b)} \psi)$.
-There are two cases to consider.
-Either the left hand side (LHS) is true, i.e. ($\sigma, v, i \models \phi$) or it is not true, i.e. ($\sigma, v, i \not\models \phi$).
-We first consider the LHS to be true, that is $\phi$ evaluates to true at the time point $i$ with the valuation mapping $v$ and the trace $\sigma$.
-The relative interval of $\phi=(\Previous{[a,b)} \psi)$ is defined as $\RI(\phi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))$.
-By our induction hypothesis $ (\sigma, v, i) \models \psi \Leftrightarrow (\filter(\sigma, \RI(\psi), i), v, i) \models \psi $ holds.
-By definition $(\filter(\sigma, \RI(\phi), i), v, i) \models \phi$ holds if and only if $i > 0, \tau_i - \tau_{i+1} \in [a,b)$ and $(\sigma, v, i-1) \models \psi$.
-From the LHS holding we know that $i>0$.
-We also know that for the LHS to be evaluated to true, $(\sigma, v, i-1) \models \psi$ must also hold.
-And by the induction hypothesis we therefore get $(\filter(\sigma, \RI(\psi), i), v, i) \models \psi$.
-This means the final condition we must show is that for the filtered trace $\sigma'$, $\tau_i - \tau_{i+1} \in [a,b)$.
-So in other words we must show that the two time points $i$ and $i+1$ with their respective time stamps $\tau_i$ and $\tau_{i+1}$ are within the relative interval of $\phi$.
+A proof by structural induction on the structure of MFOTL formulas for Lemma A.4 \cite{Basin2016} / Lemma \ref{lem:ri-completness} is provided in Basin et al. \cite{Basin2016}.
+We will extend this proof to also include the MFODL formulas as we defined them in Defintion \ref{def:mfodl-formula}.
 
-\textit{comment: is the numbering of time points generally without gaps?}
+For this we need an analogous lemma that works for regular expressions, which we will proof seperatly.
 
-If we go with the definition of filtering only applying to the past we can essentially disregard the future operators next and future match.
+\begin{lemma}
+    \label{lem:ri-completness-reg}
+    Let $\rho$ be a regular expression and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i,j) \modelsreg \phi$.
+\end{lemma}
+
+
+We write $\sigma = (\bar{\mathcal{D}}, \bar{\tau})$ and $\sigma' = (\bar{\mathcal{D}}', \bar{\tau}')$ as short hand for the two temporal structures.
+With the help of Lemma \ref{lem:ri-completness-reg} we now complete the proof for Lemma \ref{lem:ri-completness} with MFODL formulas.
+We continue the proof for the case $\phi = \Pregex{[a,b)} \rho$ where $\rho$ is a regular expression.
+Let $\sigma$ and $\sigma' $ are $ (\RI(\phi),c,i)-$overlapping.
+Where $\RI(\phi) = \RI(\Pregex{[a,b)} \rho) = (-b,0] \Cup ((-b,0] \oplus \RIr(\rho))$.
+
+\begin{alignat*}{3}
+    (\sigma, v, i) \models \phi \quad
+    &\Longleftrightarrow \quad
+        &&(\sigma, v, i) \models \Pregex{[a,b)} \rho \\
+    &\overset{\text{def \ref{def:mfodl-eval}}}{\Longleftrightarrow} \quad
+        &&j \leq i, \tau_i - \tau_j \in [a,b) \text{ and } (\sigma, v, j, i) \modelsreg \rho \\
+    &\overset{\text{lem \ref{lem:ri-completness-reg}}}{\Longleftrightarrow} \quad
+        &&j \leq i, \tau_i - \tau_j \in [a,b) \text{ and } (\sigma', v, j, i) \modelsreg \rho \\
+\end{alignat*}
+
+
+
+
+
+
+
+
+% We aim provide a more formal proof of correctness.
+% \begin{definition}
+%     \label{def:filter}
+%     We call filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to an interval $I$ at time point $j$ the trace 
+%     \begin{equation*}
+%         \filter(\sigma, I, j) = \sigma' = ((\tau_k,D_k), ..., (\tau_j,D_j))
+%     \end{equation*}
+%     where $k$ is the smallest index for which $\tau_k - \tau_j \in I \cap (-\infty,0]$.
+%     % where $k$ is the largest index for which $\tau_j - \tau_k \in I$.
+% \end{definition}
+% % TODO (N.B. You need your semantics to be defined on finite traces also!)
+% The intuition for why we intersect the interval $I$ with all negative numbers, is that this limits the range of possible time points to ones that are in the past from the perspective of $\tau_j$.
+% This is sensible, because the set of future events should be empty anyways and we can thus disregard it directly.
+% % TODO remove this in document comment
+% % \textit{comment: this restriction isn't strictly necessary, it might just over complicate things}.
+% \begin{theorem}
+%     \label{theo:filter-correctness}
+%     For all  $\sigma, v, i, \phi$:
+%     \begin{equation*}
+%         (\sigma, v, i) \models \phi
+%         \quad
+%         \Longleftrightarrow 
+%         \quad
+%         (\filter(\sigma, I, i), v, i) \models \phi
+%     \end{equation*}
+%     where $I$ is an in interval over $\mathbb{Z}$ with $\RI(\phi) \subseteq I$.
+% \end{theorem}
+% We prove that Theorem \ref{theo:filter-correctness} holds for any MFOTL or MFODL formula $\phi$ by structural induction over the formula structure of MFOTL/MFODL as defined in the definition \ref{def:mfotl-formula} and Definition \ref{def:mfodl-formula}.
+% In the following $\sigma$ is a trace $(\bar{\mathcal{D}}, \bar{\tau})$, $v$ is a valuation mapping, and $i$ is a time point.
+
+% First we consider the case $\phi = t \approx t'$.
+% \begin{alignat*}{1}
+%     (\sigma, v, i) \models \phi \quad
+%     &\Longleftrightarrow \quad
+%         (\sigma, v, i) \models t \approx t' \\
+%     &\overset{def \ref{def:mfotl-evaluation}}{\Longleftrightarrow} \quad
+%         v(t) = v(t') \\
+%     &\overset{def \ref{def:mfotl-evaluation}}{\Longleftrightarrow} \quad
+%         (\filter(\sigma, \RI(\phi), i), i, v) \models t \approx v' \\
+%     &\Longleftrightarrow \quad
+%         (\filter(\sigma, \RI(\phi), i), i, v) \models \phi
+% \end{alignat*}
+% For the other ordering relations the proof can be done analogously.
+
+% Next we consider $\phi = \phi_1 \lor \phi_2$.
+% \begin{alignat*}{3}
+%     (\sigma, v, i) \models \phi \quad
+%     &\Longleftrightarrow \quad
+%         &&(\sigma, v, i) \models \phi_1 \lor \phi_2 \\
+%     &\overset{def \ref{def:mfotl-evaluation}}{\Longleftrightarrow} \quad
+%         &&(\sigma, v, i) \models \phi_1 \text{ or } (\sigma, v, i) \models \phi_2 \\
+%     &\overset{\text{IH}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi_1 \text{ or } 
+%         (\filter(\sigma, I, i), v, i) \models \phi_2 \\
+%         &&&\text{ for } \RI(\phi_1), \RI(\phi_2) \subseteq I\\
+%     &\overset{}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi_1 \lor \phi_2 
+%         \text{ for } \RI(\phi_1), \RI(\phi_2) \subseteq I\\
+%     &\overset{def \ref{def:mfotl-evaluation}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi 
+%         \text{ for } \RI(\phi_1), \RI(\phi_2) \subseteq I\\
+% \end{alignat*}
+% To complete the proof we need to show that $\RI(\phi) = \RI(\phi_1 \lor \phi_2) = \RI(\phi_1) \Cup \RI(\phi_2) \subseteq I$.
+% This follows almost directly from the condition that $\RI(\phi_1), \RI(\phi_2) \subseteq I$ and the definition of $J_a \Cup J_b$ for two intervals $J_a$ and $J_b$ as the smallest interval that contains all elements in either $J_a$ or $J_b$.
+% We already know that all elements in the two relative intervals for $\phi_1$ and $\phi_2$ are all in $I$.
+% The only elements potentially unaccounted for are ones in between the two relative intervals, but since $I$ is an interval it cannot have any gaps and thus $(\phi_1) \Cup \RI(\phi_2) \subseteq I$ must be true.
+
+% The "and" case would be done the same way and is omitted here.
+
+% For $\phi = \exists x . \phi'$.
+% \begin{alignat*}{3}
+%     (\sigma, v, i) \models \phi \quad
+%     &\Longleftrightarrow \quad
+%         &&(\sigma, v, i) \models \exists x. \phi' \\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         &&(\sigma, v[x \mapsto d], i) \models \phi' \text{ for some } d \in |\bar{\mathcal{D}}| \\
+%     &\overset{\text{IH}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v[x \mapsto d], i) \models \phi' \text{ for some } d \in |\bar{\mathcal{D}}| \\
+%         &&&\text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models  \exists x . \phi' \\
+%         &&&\text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi \\
+%         &&&\text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{(*)}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi \\
+%         &&&\text{ for } \RI(\phi) \subseteq I\\
+% \end{alignat*}
+% $(*)$ follows from the definition of the relative interval for the exists quantifier as $\RI(\phi) = \RI(\exists x . \phi') = \RI(\phi')$ 
+% The proof for the "for all" quantifier goes the same way and is omitted here.
+
+% Now we look at negation, $\phi = \neg \phi'$.
+% \begin{alignat*}{3}
+%     (\sigma, v, i) \models \phi \quad
+%     &\Longleftrightarrow \quad
+%         &&(\sigma, v, i) \models \neg \phi' \\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         &&(\sigma, v, i) \not\models \phi' \\
+%     &\overset{\text{IH}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \not\models \phi' \text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models   \neg \phi' \text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi \text{ for } \RI(\phi') \subseteq I\\
+%     &\overset{(*)}{\Longleftrightarrow} \quad
+%         &&(\filter(\sigma, I, i), v, i) \models \phi \text{ for } \RI(\phi) \subseteq I\\
+% \end{alignat*}
+% Like with the exists quantifier the last transition $(*)$ holds, because $\RI(\phi) = \RI(\neg \phi')= \RI(\phi')$.
+
+% The next proofs are a bit more involved as they concern the temporal operators.
+% Consider $\phi = \Previous{J} \phi'$.
+% \begin{alignat*}{3}
+%     (\sigma, v, i) \models \phi \quad
+%     &\Longleftrightarrow \quad
+%         &&(\sigma, v, i) \models \Previous{J} \phi' \\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         && i > 0, \tau_i - \tau_{i+1} \in J, 
+%         \text{ and } (\sigma, v, i-1) \models \phi'\\
+%     &\overset{\text{IH}}{\Longleftrightarrow} \quad
+%         && i > 0, \tau_i - \tau_{i+1} \in J, 
+%         \text{ and } (\filter(\sigma, I', i-1), v, i-1) \models \phi' \\
+%         &&& \text{for } \RI(\phi') \subseteq I' \\
+%     &\overset{\text{def \ref{def:mfotl-evaluation}}}{\Longleftrightarrow} \quad
+%         && (\filter(\sigma, I', i-1), v, i) \models \Previous{J} \phi' \\
+%         &&& \text{for } \RI(\phi') \subseteq I' \\
+%     &\overset{}{\Longleftrightarrow} \quad
+%         && (\filter(\sigma, I', i-1), v, i) \models \Previous{J} \phi' \\
+%         &&& \text{for } \RI(\phi') \subseteq I' \\
+% \end{alignat*}
+
+
+
+
+
+% Our induction hypothesis is that Theorem \ref{theo:filter-correctness} holds for any subformulas.
+% We then show that Theorem \ref{theo:filter-correctness} holds for any formula $\phi$.
+% Only formulas of the structures $(\Previous{I} \psi),(\Next{I} \psi), (\psi \Since{I} \psi'), (\psi \Until{I} \psi'), (\Pregex{I} \rho), \text{ and } (\Fregex{I} \rho)$ depend on the trace $\sigma$.
+% Therefore Theorem \ref{theo:filter-correctness} holds trivially if $\phi$ has any other structure (first order logic and relations).
+
+% We start with $\phi = (\Previous{[a,b)} \psi)$.
+% There are two cases to consider.
+% Either the left hand side (LHS) is true, i.e. ($\sigma, v, i \models \phi$) or it is not true, i.e. ($\sigma, v, i \not\models \phi$).
+% We first consider the LHS to be true, that is $\phi$ evaluates to true at the time point $i$ with the valuation mapping $v$ and the trace $\sigma$.
+% The relative interval of $\phi=(\Previous{[a,b)} \psi)$ is defined as $\RI(\phi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))$.
+% By our induction hypothesis $ (\sigma, v, i) \models \psi \Leftrightarrow (\filter(\sigma, \RI(\psi), i), v, i) \models \psi $ holds.
+% By definition $(\filter(\sigma, \RI(\phi), i), v, i) \models \phi$ holds if and only if $i > 0, \tau_i - \tau_{i+1} \in [a,b)$ and $(\sigma, v, i-1) \models \psi$.
+% From the LHS holding we know that $i>0$.
+% We also know that for the LHS to be evaluated to true, $(\sigma, v, i-1) \models \psi$ must also hold.
+% And by the induction hypothesis we therefore get $(\filter(\sigma, \RI(\psi), i), v, i) \models \psi$.
+% This means the final condition we must show is that for the filtered trace $\sigma'$, $\tau_i - \tau_{i+1} \in [a,b)$.
+% So in other words we must show that the two time points $i$ and $i+1$ with their respective time stamps $\tau_i$ and $\tau_{i+1}$ are within the relative interval of $\phi$.
+
+% \textit{comment: is the numbering of time points generally without gaps?}
+
+% If we go with the definition of filtering only applying to the past we can essentially disregard the future operators next and future match.
 
 
 

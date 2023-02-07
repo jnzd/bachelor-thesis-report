@@ -7,32 +7,25 @@ First we move from one relative interval for an entire policy to one relative in
 We break this down further.
 Every predicate comes with a number of attributes as defined in the signature.
 Some attributes are potentially constant.
-Looking back at our example from earlier, \texttt{"advertising"} is one such constant attribute in the predicate \texttt{loc\_accessed}.
-
-\begin{verbatim}
-loc_accessed(i, "advertising") 
-IMPLIES 
-(
-    (ONCE[0,*) perm_granted(i)) 
-    AND 
-    (NOT (perm_revoked(i) SINCE[0,*) perm_granted(i)))
-)
-\end{verbatim}
-
+Looking back at our policy from Figure \ref{fig:example-policy}, \texttt{"advertising"} is one such constant attribute in the predicate \texttt{loc\_accessed}.
 This means any occurrence of the predicate \texttt{loc\_accessed} where the second attribute is not \texttt{"advertising"}, has no influence on our policy and is therefore not needed in a potential sub trace.
 We check every predicate in our policy for constant attributes.
 Then we take the set of different arrangements of constant and variable attributes per predicate.
 We call one such arrangement a mask.
 Each mask has its own relative interval.
-For our example the masks with their corresponding relative intervals are the following.
+For our example the masks with their corresponding relative intervals can be seen in Figure \ref{fig:example-ext-intervals}.
 
+\begin{figure}[H]
+    \label{fig:example-ext-intervals}
 \begin{verbatim}
 loc_accessed(*,"advertising") -> [0,0]
 perm_granted(*) -> (*,0]
 perm_revoked(*) -> (*,0]
 \end{verbatim}
+    \caption{Extended Relative Intervals of Example Policy}
+\end{figure}
 
-A \texttt{*} in the attributes denotes a variable value.
+A \texttt{*} (asterisk) in the attributes denotes a variable value.
 In larger formulas there can be multiple different masks per predicate.
 
 We use a doubly nested map data structure to store the predicates with there masks and relative intervals and call such a structure the extended relative intervals of a formula.
@@ -40,6 +33,7 @@ On the first level the keys are predicate names and values are maps from masks t
 On this data structure we define the operators $\Cupmerge$, $\Cupext$ and $\oplusext$.
 
 \begin{definition}
+    \label{def:e-rel-int-ops}
     Let $m$ and $n$ be two extended relative intervals and $i$ a positive interval, then 
     \begin{align*}
         m \Cupmerge n = 
@@ -70,6 +64,7 @@ With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now giv
 % In addition we need to helper functions $\inveri(m)$ which inverses all intervals in a map $m$ and $\zeroeri(m)$ which sets the lower bound of all intervals in the map $m$ to zero.
 
 \begin{definition}
+    \label{def:e-rel-int}
     The extended relative interval of the formula $\varphi$, $\ERI(\varphi)$ is defined recursively over the formula structure:
     \begin{equation*}
         \ERI(\varphi) = \\
@@ -101,6 +96,7 @@ With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now giv
 
 And for regular expressions we define 
 \begin{definition}
+    \label{def:e-rel-int-reg}
     The extended relative interval of the regular expression $\rho$, $\ERIr(\rho)$ is defined recursively over the structure of the regular expression:
     \begin{equation*}
         \ERIr(\rho) =
@@ -114,6 +110,7 @@ And for regular expressions we define
 \end{definition}
 
 \begin{definition}
+    \label{def:e-filter}
     We call fine-grained filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to the <name of your datastructure> X the trace 
     
     \begin{equation*}
@@ -122,6 +119,7 @@ And for regular expressions we define
 \end{definition} 
 
 \begin{theorem}
+    \label{theo:e-filter-correctness}
     For all $\sigma, v, i$:
     \begin{equation*}
         \sigma, v, i \models \varphi 

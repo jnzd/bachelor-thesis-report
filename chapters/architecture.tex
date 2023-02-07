@@ -9,14 +9,15 @@ Our wrapper acts as the glue between the two.
 In addition the wrapper also provides a new interface to MonPoly in the form of a REST API.
 Figure \ref{fig:wrapper} shows the structure of the MonPoly wrapper.
 
-\begin{center}
+% \begin{center}
 \begin{figure}
-  \includegraphics[width=140mm]{diagrams/wrapper.png}
+  \centering
+  \includegraphics[width=110mm]{diagrams/wrapper.png}
   \caption{Illustration of the project structure}
   \label{fig:wrapper}
 \end{figure}
 
-\end{center}
+% \end{center}
 
 
 
@@ -34,19 +35,11 @@ If no issue is detected with a timestamp all events in at that timestamp get for
 
 \section{The REST API}
 
+The interface to the wrapper is a REST API.
+We will now introduce the main endpoints and give brief usage examples.
 
-% \input{diagrams/actions.tex}
 
-% \section{Policy Change}
 
-% This first version of a policy change functions by stopping the current monitor and starting a new one.
-% When starting the new monitor we want to restore the state of the old one.
-% We do this by querying old events from our database.
-% But we do not simply query for the entirety of the database.
-% We make two optimizations.
-% First we use relative intervals and second we make use of constant values.
-% For each predicate occurring in a formula we look for constant attributes in its occurrences.
-% For every predicate and its potential occurrences with different constant values we then compute an over approximation of the relative interval.
-% We use this information to create a SQL query that only queries the constant values combined with the interval.
-% This way we minimize the amount of data that the new monitor has to read and process.
+
+
 
