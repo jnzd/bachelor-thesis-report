@@ -1,4 +1,10 @@
 \chapter{Implementation and Evaluation}
+
+\section{Wrapping MonPoly}
+
+\subsection{Performance}
+
+
 \section{Policy Change}
 % \input{diagrams/actions.tex}
 
@@ -20,3 +26,6 @@ For each predicate occurring in a formula we look for constant attributes in its
 For every predicate and its potential occurrences with different constant values we then compute an over approximation of the relative interval.
 We use this information to create a SQL query that only queries the constant values combined with the interval.
 This way we minimize the amount of data that the new monitor has to read and process.
+
+
+\section{Partial Policy Updates}
