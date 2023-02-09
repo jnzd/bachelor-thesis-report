@@ -459,6 +459,59 @@ We have the following cases.
         Like with Lemma A.4 \cite{Basin2016} it is simpler than "previous", because no special distinctions have to be made for $i=0$ and $i-c=0$.
     \item
         $\psi \Since{[a,b)} \chi$.
+        $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\psi \Since{[a,b)} \chi), \RI(\psi \Since{[a,b)} \chi), v, i)$- overlapping, where
+        \begin{align*}
+            \ERI(\psi \Since{[a,b)} \chi)
+            &= (-b,0] \Cupext ((-b,0] \oplusext \ERI(\psi)) \Cupmerge ((-b,-a] \oplusext \ERI(\chi))
+        \end{align*}
+        and
+        \begin{align*}
+            \RI(\psi \Since{[a,b)} \chi)
+            &= (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)).
+        \end{align*}
+        From $0 \in \RI(\psi \Since{[a,b)} \chi)$ and Condition 1 in Definition \ref{def:overlapping-ext} it follows that $\tau_i = \tau'_i-c$.
+
+        First we establish the two following claims.
+        \begin{enumerate}
+            \item
+                For all $j \in \mathbb{N}$ with $j \leq i$ and $\tau_i - \tau_j \in [a,b)$, it holds that 
+                \begin{align*}
+                    \RI(\chi) 
+                    &\subseteq \{ \tau_i - \tau_j \} \oplus \{ \tau_j - \tau_i\} \oplus \RI(\chi) \\
+                    &\subseteq \{\tau_i - \tau_j \} \oplus (-b, -a] \oplus \RI(\chi) \\
+                    &\subseteq \{ \tau_i - \tau_j \} \oplus \RI(\psi \Since{[a,b)} \chi)
+                \end{align*}
+                as well as
+                \begin{align*}
+                    \ERI(\chi) 
+                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \{ \tau_j - \tau_i\} \oplusext \ERI(\chi) \\
+                    &\subseteqmap \{\tau_i - \tau_j \} \oplusext (-b, -a] \oplusext \ERI(\chi) \\
+                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \ERI(\psi \Since{[a,b)} \chi)
+                \end{align*}
+                and $j \geq c$.
+                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\chi), \RI(\chi), c, j)$- overlapping.
+                It then follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$, for all valuations $v$.
+            \item
+                For all $k \in \mathbb{N}$ with $k \leq i$ and $\tau_i - \tau_k \in [0,b)$, it holds that
+                \begin{align*}
+                    \RI(\psi)
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus \{ \tau_k - \tau_i \} \oplus \RI(\psi) \\
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus (-b,0] \oplus \RI(\psi) \\
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus \RI(\psi \Since{[a,b)} \chi) \\
+                \end{align*}
+                as well as
+                \begin{align*}
+                    \ERI(\psi)
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \{ \tau_k - \tau_i \} \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext (-b,0] \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \ERI(\psi \Since{[a,b)} \chi) \\
+                \end{align*}
+                and $k \geq c$
+                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, k)$- overlapping.
+                It follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \psi$ for all valuations $v$.
+        \end{enumerate}
+
+
     \item
         $\psi \Until{[a,b)} \chi$.
 \end{itemize}
