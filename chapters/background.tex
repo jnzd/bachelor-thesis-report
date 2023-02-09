@@ -92,7 +92,7 @@ These additions are also in Figure 1 of Basin et. al \cite{Basin2020}.
             &&\text{iff } && (\bar{\mathcal{D}},\bar{\tau},v[x \mapsto d],i) \models \psi 
             \text{ for some } d \in |\bar{\mathcal{D}}| \\
         &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\Previous{I} \psi) 
-            &&\text{iff } && i > 0, \tau_i - \tau_{i+1} \in I, \text{ and } (\bar{\mathcal{D}}, \bar{\tau}, v, i-1) \models \psi \\
+            &&\text{iff } && i > 0, \tau_i - \tau_{i-1} \in I, \text{ and } (\bar{\mathcal{D}}, \bar{\tau}, v, i-1) \models \psi \\
         &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\Next{I} \psi)
             &&\text{iff } && \tau_{i+1} - \tau_i \in I \text{ and } (\bar{\mathcal{D}},\bar{\tau},v,i+1) \models \psi \\
         &(\bar{\mathcal{D}},\bar{\tau},v,i) \models (\psi \Since{I} \psi')
@@ -229,13 +229,93 @@ There are many different options of time series databases available.
 We were looking for something with good performance, good support for tables of data, and good usability.
 We have opted for QuestDB \cite{questdb}.
 
+\subsection{QuestDB}
 QuestDB uses a column-based storage model \cite{questdb-storage-model}.
 It supports the PostgreSQL wire protocol \cite{questdb-postgres-wire} for querying and inserting data.
-% TODO describe protocol
-It further provides a REST API and has a web console for both inserting and querying data.
-For best performance it supports the InfluxDB Line Protocol \cite{questdb-influx-db-line-protocol} with client libraries for most popular modern programming languages.
-% TODO describe protocol
-QuestDB itself is written in Java, open source, and licensed under the Apache 2.0 license.
+This is the same protocol used by the popular relational database PostgreSQL \cite{postgres}.
+The support for SQL as a query language is of great use, because SQL is the most widely used and taught database query language.
+PostgreSQL is in itself a very popular dialect of SQL and thus has a lot of tooling available which can also be used with QuestDB.
+It further provides a REST API \cite{questdb-rest} and has a web console for both inserting and querying data.
+For best performance it supports the InfluxDB Line Protocol \cite{questdb-influx-db-line-protocol, influx-line} with client libraries for most popular modern programming languages.
+InfluxDB is itself a time series database and the line protocol is a write protocol developed by and for InfluxDB optimized for time series data.
+The QuestDB client liabries for different programming languages are implementations of the InfluxDB line protocol by QuestDB.
+QuestDB recommends using the Line Protocol for the best write performance, compared to the other methods of writing data.
+The Line Protocol cannot be used to query data.
+For that the PostgrSQL Wire Protocol is the recommended method.
+QuestDB is written in Java, open source, and licensed under the Apache 2.0 license.
+
+\subsection{Time Series Databases for Runtime Monitoring}
+In this section we explore how a timeseries database can be utilized in the context of runtime monitoring.
+We will contrast policies and database queries, as well as signatures and database schemas.
+An important and possibly counter intuitive thing is that MFOTL is not any more expressive than FOL.
+In fact they have the same expression strength, i.e. any MFOTL formula can be expressed as a FOL formula and vice versa.
+Any FOL formula is by definition also a MFOTL formula.
+The other way around any trace in MFOTL can be simulated in FOL by extending predicates with two attributes for the time point and time stamp.
+Take for example the formula $\phi = \Previous{[a,b)} P()$ where $P$ is a predicate with arity $0$.
+$\phi$ is equivalent to the FOL formula $\phi' = P(t_s, t_p) \land \exists t_s' . P(t_s', t_p - 1) \land a \leq t_s - t_s' < b$.
+
+It is relatively straight forward to create a database schema from a signature like the one in Figure \ref{fig:example-signature}.
+We create one table per predicate.
+The predicate name is used as the table name.
+The columns and their types are given by the attributes.
+MonPoly allows for optional attribute names, we disregard those, if they are present and rely on the ordering of attributes.
+We need two additional columns, one for the time point, i.e. an integer index, and one for the time stamp when the event occurred.
+One additional table keeping track of all time points and their time stamps is necessary, because a time point could occur without any event attached to it, if we only had the events stored, we would lose any record of such time points.
+And any time point can influence the evaluation of a formula.
+This time stamp and time point table technically makes it redundant to store the time stamps with every predicate, since the mapping from time point indices to time stamps is injective.
+But QuestDB requires a time stamp column and it is also beneficial for performance as QuestDB is optimized for queries on time ranges.
+
+The database schema as SQL create statements for our example policy from Figure \ref{fig:example-policy} can be seen in Figure \ref{fig:example-policy-schema}.
+The \texttt{timestamp()} function is a special extension to SQL for QuestDB.
+It specifies the column that is used as the dedicated time stamp in a table.
+If it is not specified an additional time stamp column would get added.
+% The \texttt{PARTITION BY DAY} part tells QuestDB how to partition the tables.
+By default no partitioning would be used.
+
+\begin{figure}[H]
+    \label{fig:example-policy-schema}
+\begin{verbatim}
+CREATE TABLE perm_revoked(x1 INT,
+                          time_stamp TIMESTAMP,
+                          time_point INT) 
+                          timestamp(time_stamp);
+CREATE TABLE perm_granted(x1 INT,
+                          time_stamp TIMESTAMP,
+                          time_point INT) 
+                          timestamp(time_stamp);
+CREATE TABLE loc_accessed(x1 INT, x2 STRING,
+                          time_stamp TIMESTAMP,
+                          time_point INT) 
+                          timestamp(time_stamp);
+CREATE TABLE ts( time_stamp TIMESTAMP,
+                 time_point INT) 
+                 timestamp(time_stamp);
+\end{verbatim}
+% \begin{verbatim}
+% CREATE TABLE perm_revoked(x1 INT,
+%                           time_stamp TIMESTAMP,
+%                           time_point INT) 
+%                           timestamp(time_stamp)
+%                           PARTITION BY DAY;
+% CREATE TABLE perm_granted(x1 INT,
+%                           time_stamp TIMESTAMP,
+%                           time_point INT) 
+%                           timestamp(time_stamp) 
+%                           PARTITION BY DAY;
+% CREATE TABLE loc_accessed(x1 INT, x2 STRING,
+%                           time_stamp TIMESTAMP,
+%                           time_point INT) 
+%                           timestamp(time_stamp) 
+%                           PARTITION BY DAY;
+% CREATE TABLE ts( time_stamp TIMESTAMP,
+%                  time_point INT) 
+%                  timestamp(time_stamp) 
+%                  PARTITION BY DAY;
+% \end{verbatim}
+    \caption{SQL Schema for Example Policy}
+\end{figure}
+
+
 % TODO describe addition of timestamp in rows
 % TODO describe form of queries
  

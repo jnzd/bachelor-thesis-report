@@ -22,7 +22,36 @@ At this point the policy change is done, and the wrapper can continue with its n
 
 \section{Conversion to SQL-Query}
 Now let's consider how we can convert the extended relative intervals as we have them in Figure \ref{fig:example-ext-intervals} to a SQL query.
+On a high level we have one \texttt{SELECT} query for each table corresponding to a predicate. The different masks and their relative intervals are appended as conjunctions with a single \texttt{WHERE} clause.
+Let's assume we have a predicate $p$ with $n \in \mathbb{N}$ mask- relative interval tuples, $((m_1, r_1), \dots (m_n,r_n))$.
+Variable values in a mask are disregarded.
+If the constant values in a mask $m_i = (m_{i1}, \dots, m_{i{\iota(p)}})$ 
+have the indices $j_1, \dots, j_l$, with 
+$l \leq \iota(p)$
+and the relative interval is $[a,b)$, then the corresponding SQL clause is \texttt{WHERE (x<$j_1$> = $m_{ij_1}$ AND ... AND x<$j_l$> AND ts >= $a$ AND ts < $b$)}.
+Depending on wheter an interval bound is open or closed, the corresponding comparison operators are used.
+If an interval is unbounded, then that bound is omitted and all events are retrieved.
+When multiple masks and intervals for a predicate exist, multiple of the described conditions are concatenated with \texttt{AND}.
+This approach adds potentially overlapping conditions.
+A good query processor will hopefully recognize those and make optimizations when appropriate.
+We run every query for each predicate on the database.
+One additional query is necessary for the \texttt{ts} table that gets all time points in the relative interval covering the whole formula.
+For our example policy in Figure \ref{fig:example-policy} with the extended relative intervals as seen in Figure \ref{fig:example-ext-intervals} and the schema in Figure \ref{fig:example-policy-schema} we get the following SQL query.
 
+\begin{figure}[H]
+    \label{fig:ext-sql-query}
+\begin{lstlisting}
+FROM loc_accessed SELECT * WHERE (x2 = "advertising" AND
+                                  time_stamp >= $\tau_i - 0$ AND
+                                  time_stamp <= $\tau_i - 0$)
+FROM perm_granted SELECT * WHERE (time_stamp <= $\tau_i - 0$)
+FROM perm_revoked SELECT * WHERE (time_stamp <= $\tau_i - 0$)
+FROM ts           SELECT * WHERE (time_stamp <= $\tau_i - 0$)
+\end{lstlisting}
+    \caption{Extended Relative Intervals of Example Policy}
+\end{figure}
+
+The time stamp is converted to a unix style time stamp string that can be understood by QuestDB \cite{questdb-time-stamps}
 
 
 

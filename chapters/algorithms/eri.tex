@@ -7,11 +7,18 @@ First we move from one relative interval for an entire policy to one relative in
 We break this down further.
 Every predicate comes with a number of attributes as defined in the signature.
 Some attributes are potentially constant.
+
 Looking back at our policy from Figure \ref{fig:example-policy}, \texttt{"advertising"} is one such constant attribute in the predicate \texttt{loc\_accessed}.
 This means any occurrence of the predicate \texttt{loc\_accessed} where the second attribute is not \texttt{"advertising"}, has no influence on our policy and is therefore not needed in a potential sub trace.
 We check every predicate in our policy for constant attributes.
 Then we take the set of different arrangements of constant and variable attributes per predicate.
-We call one such arrangement a mask.
+We define a structure that captures constant and variable attributes of a predicate.
+\begin{definition}
+    \label{def:mask}
+    Let $S=(C,R,\iota)$ be a signature and $r \in R$ a predicate with arity $\iota(r)$.
+    A mask for the predicate $r$ is a tuple $m=(m_1, \dots, m_{\iota(r)})$ with $m_1, \dots, m_{\iota(r)} \in C \cup \{v\}$ and $v \not\in V \cup C$.
+\end{definition}
+$v$ is a placeholder value denoting attributes in the mask that have a non-constant value.
 Each mask has its own relative interval.
 For our example the masks with their corresponding relative intervals can be seen in Figure \ref{fig:example-ext-intervals}.
 
@@ -25,16 +32,24 @@ perm_revoked(*) -> (*,0]
     \caption{Extended Relative Intervals of Example Policy}
 \end{figure}
 
-A \texttt{*} (asterisk) in the attributes denotes a variable value.
+A \texttt{*} (asterisk) in the attributes denotes a variable value, $v$ in Definition \ref{def:mask}.
 In larger formulas there can be multiple different masks per predicate.
+Let $\mathcal{M}(r)$ be the set of possible masks for a predicate $r$.
 
-We use a doubly nested map data structure to store the predicates with there masks and relative intervals and call such a structure the extended relative intervals of a formula.
-On the first level the keys are predicate names and values are maps from masks to intervals.
+We use a map data structure to store the predicates, masks, and their respective relative intervals.
+
+\begin{definition}
+    \label{def:map}
+    Let $S=(C,R,\iota)$ be a signature and let $\mathcal{M} : R \to \{(C \cup \{v\})^*\}$ be the function $\mathcal{M}(r) = M$ that gives the set of all possible masks $M$ for a predicate $r$.
+    An \textbf{masked predicate map} is a set $\{(k,i)\}$ where $k = (r,m)$ with $r \in R$ and $m \in \mathcal{M}(r)$ and $i \subseteq \mathbb{Z}$ is an interval over $\mathbb{Z}$. 
+\end{definition}
+
+
 On this data structure we define the operators $\Cupmerge$, $\Cupext$ and $\oplusext$.
 
 \begin{definition}
     \label{def:e-rel-int-ops}
-    Let $m$ and $n$ be two extended relative intervals and $i$ a positive interval, then 
+    Let $m$ and $n$ be two masked predicate maps and $i$ a positive interval, then 
     \begin{align*}
         m \Cupmerge n = 
             & \{ p(l) \rightarrow (i \Cup j) \mid 
@@ -57,10 +72,10 @@ On this data structure we define the operators $\Cupmerge$, $\Cupext$ and $\oplu
     \end{align*}
 \end{definition}
 
-The notation $p(l) \rightarrow i$ denotes an element in our doubly nested map structure.
-$p$ is a first level key, i.e. a predicate name, $l$ is a second level key, i.e. a mask and $i$ denotes the interval the key combination $p(l)$ is pointing to.
-The $\keys$ operator gives all combinations of outer keys (predicate names) and inner keys (masks) in an extended relative intervals structure.
-With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now give a recursive definition for our extended relative intervals.
+The notation $p(l) \rightarrow i$ denotes an element in an masked predicate map.
+It is equivalend to the notation $((p,l), i)$, but it better shows how we are working with a map.
+The $\keys$ operator gives all the first elements, the predicate name and mask tuples, in a masked predicate map.
+With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now give a recursive definition for our extension of relative intervals.
 % In addition we need to helper functions $\inveri(m)$ which inverses all intervals in a map $m$ and $\zeroeri(m)$ which sets the lower bound of all intervals in the map $m$ to zero.
 
 \begin{definition}
@@ -109,34 +124,197 @@ And for regular expressions we define
     \end{equation*}
 \end{definition}
 
-\begin{definition}
-    \label{def:e-filter}
-    We call fine-grained filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to the <name of your datastructure> X the trace 
+% \begin{definition}
+%     \label{def:e-filter}
+%     We call fine-grained filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to the <name of your datastructure> X the trace 
     
-    \begin{equation*}
-        \filter'(\sigma, X, j) = ....
-    \end{equation*}
-\end{definition} 
+%     \begin{equation*}
+%         \filter'(\sigma, X, j) = ....
+%     \end{equation*}
+% \end{definition} 
 
-\begin{theorem}
-    \label{theo:e-filter-correctness}
-    For all $\sigma, v, i$:
-    \begin{equation*}
-        \sigma, v, i \models \varphi 
-        \Leftrightarrow \filter'(\sigma, \ERI(\phi), i), v, i \models \varphi
-    \end{equation*}
-\end{theorem} 
+% \begin{theorem}
+%     \label{theo:e-filter-correctness}
+%     For all $\sigma, v, i$:
+%     \begin{equation*}
+%         \sigma, v, i \models \varphi 
+%         \Leftrightarrow \filter'(\sigma, \ERI(\phi), i), v, i \models \varphi
+%     \end{equation*}
+% \end{theorem} 
 
 \subsection{Correctness}
-Analogous to the definition of $\RI$ we now want to proof that $\varphi$ evaluated on the sub trace $\sigma'$ extracted with $\ERI(\varphi)$ leads to the same truth value as with the full trace $\sigma$.
+Analogously to regular intervals we want to use the extended relative intervals to extract (slice) a sub trace from a larger trace for a given formula that has the property that the sub trace is sufficient to evaluate the formula.
+We first need a few definitions and lemmata before we can proof this property.
+\begin{definition}
+    \label{def:matching-predicate}
+    Let $\mathcal{D}$ be a structure over the signature $S = (C,R,\iota)$, $r^{\mathcal{D}} \in |\mathcal{D}|$ be an interpration for the predicate $r \in R$, and $m$ a mask for $r$.
+    The arity of $r$, $\iota(r)$ is the same as the length of the mask $m$, $|m|$.
+    The mask $m = (m_1, \dots, m_{\iota(r)})$ matches the interpretation $r^{\mathcal{D}}= (r^{\mathcal{D}}_1, \dots, r^{\mathcal{D}}_{\iota(r)})$ if for all $i \in [1,\iota(r)]$ either $m_i = v$ or $m_i = r^{\mathcal{D}}_i$, where $v$ is again the place holder value for variable values.
+\end{definition}
+\begin{definition}
+    \label{def:filter}
+    Let $M$ be a masked predicate map $\tau \in \mathbb{N}$ a time stamp and $\mathcal{D}$ a structure over the signature $S = (C,R,\iota)$.
+    Let $\mathbb{D}$ be the set of all structures over the signature $S$.
+    $\filter(M, \tau,\mathcal{D}) : \mathbb{D} \to \mathbb{D}$ is a function only keeping interprations $r^{\mathcal{D}} \in |\mathcal{D}|$ that have a matching predicate mask $m$ and relative interval $I$, $(m,I) \in M$ with $\tau \in I$ as well as constant interpretations $c^{\mathcal{D}} \in |\mathcal{D}|$.
+\end{definition}
+The following lemma states that filtering a structure twice has the same effect as filtering once.
+\begin{lemma}
+    \label{lem:double-filter}
+    Let $\mathcal{D}$ be a structure, let $M$ be a masked predicate map and let $\tau \in \mathbb{N}$ be a time stamp.
+    Then $\filter(M, \tau ,\filter(M, \tau, \mathcal{D})) = \filter(M, \tau, \mathcal{D})$.
+\end{lemma}
+\textit{Proof} From Definition \ref{def:filter} we have that the constant interpretations remain untouched by the filter operation.
+It remains to show that the left hand side (LHS) and the right hand side (RHS) in Lemma \ref{lem:double-filter} have the same interpretations for predicates.
+The RHS only contains interpretations for predicates from $\mathcal{D}$ that have a matching mask for which its relative interval contains $\tau$.
+The LHS contains interpretations fullfilling the same constraint, but they are "sampled" from the structure $\filter(M,\tau,\mathcal{D})$ instead of $\mathcal{D}$ directly.
+But we already established that all predicate interpretations in the filtered structure (RHS) do fullfill the condition that they have a matching mask in $M$ whose relative interval contains $\tau$.
+Therefore the LHS and RHS are equivalent and the Lemma holds.
 
-To get a correct sub trace $\sigma'$ we cannot simply extract the sub trace per predicate and mask.
-There are possibly time points and time stamps in the original trace that have no predicate attached to them.
-Therefore we additionally need to extract all such time stamps that fall into the regular relative interval of the formula.
-Empty time points or time stamps can influence the truth value of a formula and can therefore not be omitted.
+\begin{definition}
+    \label{def:mt-slice}
+    Let $T \subseteq \mathbb{Z}$ be an interval and $M$ be a masked predicate map where for all $(m, J) \in M$, $J \subseteq T$.
+    And let $(\bar{\mathcal{D}}, \bar{\tau})$ a trace.
+    The MT-slice of $(\bar{\mathcal{D}}, \bar{\tau})$ is the time slice $(\bar{\mathcal{D}}', \bar{\tau}')$ of $(\bar{\mathcal{D}}, \bar{\tau})$, where $s:[0,l) \to \mathbb{N}$ is the function $s(i') = i' + c, l = |\{i \in \mathbb{N} \mid \tau_i \in T\}|$, and $c = \min\{i \in \mathbb{N} \mid \tau_i \in T \}$. 
+    We also require that $\tau_l' \not\in T$ and $\mathcal{D}'_{i'} = \filter(M, \tau_{s(i')}, \mathcal{D}_{s(i')})$, for all $i' \in [0,l)$.
+\end{definition}
 
-The first case of atomic formulas that are not a predicate is trivial.
-They do not depend on any events that may or may not be present in a log and can be evaluated as is.
-Next a simple predicate only depends on the current time point with time stamp $0$.
-For the unary and binary first order logic formulas (negation, quantification, and, or) the extended relative interval is the special union of relative intervals of the sub formula(s).
-Special union referring to the operator that keeps the intervals as intervals.
+
+\begin{definition}
+    \label{def:overlapping-ext}
+    Let $I \subseteq \mathbb{Z}$ be an interval and $M$ be a masked predicate map where for all $(m, J) \in M$, $J \subseteq I$.
+    Let $c,i \in \mathbb{N}$.
+    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$-overlapping if the following conditions hold:
+    \renewcommand{\labelenumi}{\arabic{enumi}.}
+    \begin{enumerate}
+        \item $j \geq c$, $\filter(M, \tau_j, \mathcal{D}_j)=\filter(M, \tau'_{j-c}, \mathcal{D}'_{j-c})$ and $\tau_j = \tau'_{j-c}$, for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$,
+        \item $\filter(M, \tau_{j' + c}, \mathcal{D}_{j' + c})=\filter(M, \tau'_{j'}, \mathcal{D}'_{j'})$ and $\tau_{j' + c} = \tau'_{j'}$, for all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_i \in I$,
+    \end{enumerate}
+\end{definition}
+Like with Definition \ref{def:overlapping}, two traces are $(M,I,c,i)$-overlapping if their \textit{filtered} time points are the same on an interval of time stamps.
+The next lemma establishes that a trace and an $MT$-slice of that trace are $(M,I,c,i)$-overlapping.
+It is analogous to Lemma A.2 in Basin et al. \cite{Basin2016}.
+\begin{lemma}
+    \label{lem:mt-slice-overlap}
+    Let $T \subseteq \mathbb{N}$ and $I \subseteq \mathbb{Z}$ be intervals and $M$ be a masked predicate map where for all $(m,J) \in M$, $J \subseteq I$.
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$ a trace, and $(\bar{\mathcal{D}}', \bar{\tau}')$ a $(I \oplusext M, I \oplus T)$-slice of $(\bar{\mathcal{D}}, \bar{\tau})$.
+    The traces $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$-overlapping, for all $i \in \mathbb{N}$ with $\tau_i \in T$, where $c \in \mathbb{N}$ is the value in Definition \ref{def:mt-slice} used by the function $s$.
+\end{lemma}
+\textit{Proof} the precondition in Definition \ref{def:overlapping-ext}, that for all intervals in M are a subset of the larger interval $I$ is satisfied, as it is also a precondition for Lemma \ref{lem:mt-slice-overlap}.
+First we show condition 1 in Definition \ref{def:overlapping-ext}.
+For all $i \in \mathbb{N}$ with $\tau_i \in T$ and all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$, it holds that $\tau_j \in T \oplus I$.
+From $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \oplus I\}$ in Definition \ref{def:mt-slice}, it follows that $j \geq c$.
+Let $j' := j-c$.
+It also follows from $\tau_j \in T \oplus I$ that $j' \in [0,l)$.
+Thus $\tau_j = \tau_{s(j')} = \tau'_{j'} = \tau'_{j - c}$.
+Per Definition \ref{def:mt-slice} we have $\mathcal{D}'_{j'} = \filter(M, \tau_j, \mathcal{D}_j)$.
+By Lemma \ref{lem:double-filter} we have that $\mathcal{D}'_{j'} = \filter(M, \tau_j, \filter(M, \tau_j, \mathcal{D}_j)) = \filter(M, \tau_j, \mathcal{D}'_{j'})$.
+Therefore it follows that $\mathcal{D}'_{j'} = \filter(M, \tau'_{j'}, \mathcal{D}'_{j'})$.
+Thus Condition 1. of Lemma \ref{lem:mt-slice-overlap} is satisfied.
+
+Next we show that Condition 2. is also satisfied. For all $i \in \mathbb{N}$ with $\tau_i \in T$ and all $j' \in \mathbb{N}$ with $\tau'_{j'}-\tau_i \in I$, it holds that $\tau'_{j'} \in T \oplus I$. Since $\tau'_l \not\in T \oplus I$, it follows that $j' \in [0,l)$.
+Therefore $\tau_{j'+c} = \tau_{s(j')} = \tau'_{j'}$.
+From Definition \ref{def:overlapping-ext} it follows that $\mathcal{D}$ \dots
+
+\dots
+
+
+Analogous to Lemma A.3 in Basin et al. \cite{Basin2016} the following Lemma states that any overlapping traces still overlap, also overlap on parts of of the overlapping section.
+
+\dots
+\begin{lemma}
+    \label{lem:eri-overlap-transitivity}
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ be two traces that are $(M,I,c,i)$-overlapping, for some masked predicate map $M$, $I \in \mathbb{Z}$, $c \in \mathbb{N}$, and $i \in \mathbb{Z}$.
+    Then $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M, K, c, k)$-overlapping, for each $k \in \mathbb{N}$ with $\tau_k - \tau_i \in I$ and $K \subseteq \{ \tau_i - \tau_k \} \oplus I$.
+
+    \dots
+\end{lemma}
+\textit{Proof} \dots
+
+With this we get to the key Lemma that we rely on to make our optimization when selecting and querying a subtrace from the database.
+It is analogous to Lemma A.4 in Basin et al. \cite{Basin2016}.
+
+\begin{lemma}
+    \label{lem:eri-overlap}
+    Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \phi$.
+\end{lemma}
+This Lemma applies to MFOTL formulas.
+It can be extended to MFODL as well, but it needs a mutually recursive extensions to include regular expressions.
+We focus on the core MFOTL formulas.
+
+\textit{Proof} First we note that for the same reason as in Lemma A.4 in Basin et al. \cite{Basin2016}, the lemma's statement is well-defined, as the definition of $\RI(\phi)$ did not change and still includes $0$.
+We proof the lemma by structural induction on the formula $\phi$.
+In this proof $S = (C, R, \iota)$ is a signature, with constants $C$, predicats $R$, and the arity function $\iota$.
+Similarly $V$ is the set of variables.
+We have the following cases.
+
+\begin{itemize}
+    \item $t \approx t'$, where $t, t' \in V \cup C$. 
+    The satisfaction of $t \approx t'$ depends only on the valuation $v$.
+    Therefore it follows that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models t \approx t'$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c) \models t \approx t'$.
+    \item $t \prec t'$ and $t \preceq$ are analogous to the first one and their detailed proofs are ommitted.
+    \item $r(\bar(t))$, where $t_1, \dots, t_{\iota(r)} \in V \cup C$. 
+    Since $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping it follows from Condition 1 in Definition \ref{def:overlapping-ext} that $\filter(\ERI(\phi), \tau_j, \mathcal{D}_j)$ = $\filter(\ERI(\phi), \tau'_{j-c} \mathcal{D}'_{j-c})$.
+    We make a case distinction on whether $v(\bar{t}) \in r^{\mathcal{D}_i}$, for some time point $\tau_i$.
+    If it is 
+    \item $\neg \psi$. 
+    \item $\psi \lor \chi$.
+    \item $\exists . \psi$.
+    \item $\Previous{[a,b)} \psi$.
+    \item $\Next{[a,b)}$.
+    \item $\psi \Since{[a,b)} \chi$.
+    \item $\psi \Until{[a,b)} \chi$.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \begin{lemma}
+%     \label{lem:ri-completness}
+%     Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i) \models \phi$.
+% \end{lemma}
+
+% A proof by structural induction on the structure of MFOTL formulas for Lemma A.4 \cite{Basin2016} / Lemma \ref{lem:ri-completness} is provided in Basin et al. \cite{Basin2016}.
+% We will extend this proof to also include the MFODL formulas as we defined them in Defintion \ref{def:mfodl-formula}.
+
+% For this we need an analogous lemma that works for regular expressions.
+
+% \begin{lemma}
+%     \label{lem:ri-completness-reg}
+%     Let $\rho$ be a regular expression and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RIr(\rho),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \rho$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c,j-c) \modelsreg \rho$.
+% \end{lemma}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% regular interval lemmata
+% We also need Definition A.4 from Basin et al. \cite{Basin2016}.
+% \begin{definition}
+%     \label{def:overlapping}
+%     Let $I \subseteq \mathbb{Z}$ be an interval and $c,i \in \mathbb{N}$.
+%     The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(I,c,i)$-overlapping if the following conditions hold:
+%     \renewcommand{\labelenumi}{\arabic{enumi}.}
+%     \begin{enumerate}
+%         \item $j \geq c, \mathcal{D}_j = \mathcal{D}'_{j-c},$ and $\tau_j = \tau'_{j-c},$ for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$.
+%         \item $\mathcal{D}_{j'+c} = \mathcal{D}'_j,$ and $\tau_{j'+c} = \tau'_{j'},$ for all $j' \in \mathbb{N}$ with $\tau'_{j'}-\tau_i \in I$.
+%     \end{enumerate}
+% \end{definition}
+% And finally Lemma A.4 itself.
+% \begin{lemma}
+%     \label{lem:ri-completness}
+%     Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i) \models \phi$.
+% \end{lemma}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Justification/ intuition for also getting all time points inside the entire regular interval
+% To get a correct sub trace $\sigma'$ we cannot simply extract the sub trace per predicate and mask.
+% There are possibly time points and time stamps in the original trace that have no predicate attached to them.
+% Therefore we additionally need to extract all such time stamps that fall into the regular relative interval of the formula.
+% Empty time points or time stamps can influence the truth value of a formula and can therefore not be omitted.
+
+% The first case of atomic formulas that are not a predicate is trivial.
+% They do not depend on any events that may or may not be present in a log and can be evaluated as is.
+% Next a simple predicate only depends on the current time point with time stamp $0$.
+% For the unary and binary first order logic formulas (negation, quantification, and, or) the extended relative interval is the special union of relative intervals of the sub formula(s).
+% Special union referring to the operator that keeps the intervals as intervals.

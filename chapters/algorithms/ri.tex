@@ -50,7 +50,7 @@ We recursively define the relative interval of regular expressions as seen in Ba
 % Basin et al. \cite{Basin2016} provides an intuition for why the definition of $\RI$ makes sense.
 We want to show that it is sufficient to extract all time points with a time stamp in the relative interval $\RI(\phi)$ for a formula $\phi$ from a trace to evaluate $\phi$.
 Lemma A.4 in Basin et al. \cite{Basin2016} provides exactly this.
-The lemma says that the evaluation of a formula $\phi$ is the same on two different temporal structures (traces) for the time point with index $i$ in the first structure and the time point with index $i-c$ in the second structure if they ar $(RI(\phi),c,i)$-overlapping as defined by Definition A.4 in Basein et al. \cite{Basin2016}.
+The lemma says that the evaluation of a formula $\phi$ is the same on two different temporal structures (traces) for the time point with index $i$ in the first structure and the time point with index $i-c$ in the second structure if they are $(RI(\phi),c,i)$-overlapping as defined by Definition A.4 in Basin et al. \cite{Basin2016}.
 
 For convenience we restate Lemma A.4 and the definitions it requires here.
 First we recall Definition A.2 from Basin et al. \cite{Basin2016}.
@@ -72,6 +72,31 @@ We also need Definition A.4 from Basin et al. \cite{Basin2016}.
         \item $\mathcal{D}_{j'+c} = \mathcal{D}'_j,$ and $\tau_{j'+c} = \tau'_{j'},$ for all $j' \in \mathbb{N}$ with $\tau'_{j'}-\tau_i \in I$.
     \end{enumerate}
 \end{definition}
+
+Lemma A.1 in Basin et al. \cite{Basin2016} is useful, we restate it here.
+\begin{lemma}
+    \label{lem:zero-ri}
+    For every formula $\phi$, $0 \in \RI(\phi)$.
+\end{lemma}
+The proof that this holds is a structural induction over the formula structure for both MFOTL and MFODL, except that the MFODL part requires a similar lemma for regular expressions.
+
+\begin{lemma}
+    \label{lem:zero-ri-reg}
+    For every regular expression $\rho$, $0 \in \RIr(\rho)$.
+\end{lemma}
+% The proof of this lemma is a simple structural induction over the structure of regular expressions and is omitted here.
+\textit{Proof} the first case is a regular expression $\rho = \star^k$ for $k \in \mathbb{N}$.
+Tiviallay $0 \in \RIr(\rho) = \RIr(\star^k) = {0}$.
+Next $\rho = \phi?$ for a formula $\phi$.
+$\RIr(\rho) = \RIr(\phi?) = \RI(\phi)$.
+By Lemma \ref{lem:zero-ri} $0 \in \RI(\phi)$ and thus $0 \in \RIr(\rho)$.
+Now we consider $\rho = \sigma \Cup \tau$ for two regular expressions $\sigma$ and $\tau$.
+By the induction hypothesis (IH) $0 \in \RIr(\sigma)$ and $0 \in \RIr(\tau)$.
+Thus $0 \in \RIr(\sigma) \Cup \RIr(\tau) = \RIr(\rho)$.
+Finally $\rho = \sigma *$ for a regular expression $\sigma$.
+By IH $0 \in \RIr(\sigma) = \RIr(\rho)$.
+Therefore Lemma \ref{lem:zero-ri-reg} holds for all regular expressions.
+
 And finally Lemma A.4 itself.
 \begin{lemma}
     \label{lem:ri-completness}
@@ -82,14 +107,15 @@ And finally Lemma A.4 itself.
 A proof by structural induction on the structure of MFOTL formulas for Lemma A.4 \cite{Basin2016} / Lemma \ref{lem:ri-completness} is provided in Basin et al. \cite{Basin2016}.
 We will extend this proof to also include the MFODL formulas as we defined them in Defintion \ref{def:mfodl-formula}.
 
-For this we need an analogous lemma that works for regular expressions, which we will proof seperatly.
+For this we need an analogous lemma that works for regular expressions.
 
 \begin{lemma}
     \label{lem:ri-completness-reg}
     Let $\rho$ be a regular expression and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
-    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i,j) \modelsreg \phi$.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RIr(\rho),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \rho$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c,j-c) \modelsreg \rho$.
 \end{lemma}
 
+\textit{Proof} Note that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c, j-c) \modelsreg \rho$ is defined.
 
 We write $\sigma = (\bar{\mathcal{D}}, \bar{\tau})$ and $\sigma' = (\bar{\mathcal{D}}', \bar{\tau}')$ as short hand for the two temporal structures.
 With the help of Lemma \ref{lem:ri-completness-reg} we now complete the proof for Lemma \ref{lem:ri-completness} with MFODL formulas.
