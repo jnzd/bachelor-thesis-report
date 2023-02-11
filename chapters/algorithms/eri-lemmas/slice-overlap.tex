@@ -6,30 +6,36 @@
 \end{lemma}
 \textit{Proof}
 % TODO change proof to correspond to updated lemma
-This proof follows the same structure as the proof to Lemma A.2 in Basin et al. \cite{Basin2016}.
+This proof follows the same structure as the proof to Lemma A.2 in Basin et al. \cite{Basin2016} and the first few steps are the same.
 The precondition in Definition \ref{def:overlapping-ext}, that every interval in $M$ is contained in the interval $T$, is satisfied, as it is also a precondition for Lemma \ref{lem:mt-slice-overlap}.
 First we show condition 1 in Definition \ref{def:overlapping-ext}.
-For all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T$, $\tau_j \in \{\tau_i\} \oplus T$.
-From $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$ 
-
-
-From Definition \ref{def:mt-slice} it follows that $\tau_{j} \in T$ for all $j \in \{c\} \oplus [0,l)$, because $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$, and $l = |\{k \in \mathbb{N} \mid \tau_k \in T\}|$.
+For all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T$, it follows from $\tau_i \in I$ that $\tau_j \in T \oplus I$.
+From $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$ we get $j \geq c$.
+Even more precisely  for all $j \in \mathbb{N}$ with $\tau_j \in T \oplus I$, we get that $j \in [c, l+c)$.
 % As a direct consequence we get $j \geq c$.
-And it also follows from Definition \ref{def:mt-slice} that
+From Definition \ref{def:mt-slice} it follows that
 \begin{align*}
     \mathcal{D}'_{j-c}
-    & = \filter(M, \mathcal{D}_{s(j-c)}, \tau_{s(j-c)}, \tau_i) \\
-    & = \filter(M, \mathcal{D}_{j-c+c}, \tau_{j-c+c}, \tau_i) \\
+    & = \filter(T \oplusext M, \mathcal{D}_{s(j-c)}, \tau_{s(j-c)}, \tau_i) \\
+    & = \filter(T \oplusext M, \mathcal{D}_{j-c+c}, \tau_{j-c+c}, \tau_i) \\
+    & = \filter(T \oplusext M, \mathcal{D}_{j}, \tau_{j}, \tau_i), 
+\end{align*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T \oplus I$.
+With the help of Lemma \ref{lem:oplusext-zero} and Definition \ref{def:filter} (shifting all intervals in a map, shifts all time stamps that fall into these intervals the same way) we can convince ourselves that the above fact implies
+\begin{align*}
+    \mathcal{D}'_{j-c}
+    & = \filter((-T \oplus T) \oplusext M, \mathcal{D}_{s(j-c)}, \tau_{s(j-c)}, \tau_i) \\
+    & = \filter(\{0\} \oplusext M, \mathcal{D}_{j-c+c}, \tau_{j-c+c}, \tau_i) \\
     & = \filter(M, \mathcal{D}_{j}, \tau_{j}, \tau_i), 
 \end{align*}
-for all $j \in \mathbb{N}$ with $j-c \in [0,l)$, i.e. for all $j \in \{c\} \oplus [0,l)$, where $l = |\{k \in \mathbb{N} \mid \tau_k \in T \}|$.
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in (-T \oplus T) \oplus I = I$.
 Thus we get
 \begin{align*}
     \mathcal{D}'_{j-c}
     & = \filter(M, \mathcal{D}_{j}, \tau_{j}, \tau_i), 
 \end{align*}
-for all $j \in \mathbb{N}$ with $\tau_j \in T$.
-From Lemma \ref{lem:double-filter} we get that
+for all $i \in \mathbb{N}$ with $\tau_i \in T$, and $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$.
+From Lemma \ref{lem:double-filter} it follows that
 \begin{align*}
     \mathcal{D}'_{j-c}
     &= \filter(M, \mathcal{D}_j, \tau_j, \tau_i) \\
@@ -37,3 +43,40 @@ From Lemma \ref{lem:double-filter} we get that
     &= \filter(M, \mathcal{D}'_{j-c}, \tau_j, \tau_i) \\
     &= \filter(M, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i) \\
 \end{align*}
+for all $j \in \mathbb{N}$.
+And with that we have shown everything for Condition 1 in Definition \ref{def:overlapping-ext}.
+
+For Condition 2 we can deduce that for all $i \in \mathbb{N}$ with $\tau_i \in T$ and for all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_i \in I$, $\tau'_{j'} \in T \oplus I$.
+And because $\tau'_l \not\in T \oplus I$, $j' \in [0,l)$.
+Hence $\tau_{j'+c} = \tau_{s(j')} = \tau'_{j'}$.
+From Definition \ref{def:mt-slice} it follows that
+\begin{align*}
+    \mathcal{D}'_{j'}
+    & = \filter(T \oplusext M, \mathcal{D}_{s(j')}, \tau_{s(j')}, \tau_i) \\
+    & = \filter(T \oplusext M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i) \\
+\end{align*}
+for all $j' \in \mathbb{N}$ with $\tau_j' - \tau_i \in T \oplus I$.
+Again with the help of Lemma \ref{lem:oplusext-zero} and Definition \ref{def:filter} we can convince ourselves that the above fact implies
+\begin{align*}
+    \mathcal{D}'_{j'}
+    & = \filter((-T \oplus T) \oplusext M, \mathcal{D}_{s(j')}, \tau_{s(j')}, \tau_i) \\
+    & = \filter(\{0\} \oplusext M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i) \\
+    & = \filter(M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i), 
+\end{align*}
+for all $j' \in \mathbb{N}$ with $\tau_j' - \tau_i \in (-T \oplus T) \oplus I = I$.
+Thus we get
+\begin{align*}
+    \mathcal{D}'_{j'}
+    & = \filter(M, \mathcal{D}_{j'+c}, \tau_{j+c}, \tau_i), 
+\end{align*}
+And like with condition 1, from Lemma \ref{lem:double-filter} it follows that
+\begin{align*}
+    \mathcal{D}'_{j'}
+    & = \filter(M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i)\\
+    & = \filter(M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i)\\ 
+    & = \filter(M, \filter(M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i), \tau_{j'+c}, \tau_i) \\
+    & = \filter(M, \mathcal{D}'_{j'}, \tau_{j'+c}, \tau_i) \\
+    & = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i),\\
+\end{align*}
+for all $j' \in \mathbb{N}$.
+And with that we have shown everything for Condition 2 in Definition \ref{def:overlapping-ext}.

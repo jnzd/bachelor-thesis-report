@@ -47,7 +47,7 @@ We use a map data structure to store the predicates, masks, and their respective
 \begin{definition}
     \label{def:map}
     Let $S=(C,R,\iota)$ be a signature and let $\mathcal{M} : R \to \{(C \cup \{v\})^*\}$ be the function $\mathcal{M}(r) = M$ that gives the set of all possible masks $M$ for a predicate $r$.
-    An \textbf{masked predicate map} is a set $\{(k,i)\}$ where $k = (r,m)$ with $r \in R$ and $m \in \mathcal{M}(r)$ and $i \subseteq \mathbb{Z}$ is an interval over $\mathbb{Z}$. 
+    A \textbf{masked predicate map} is a set $\{(k,i)\}$ where $k = (r,m)$ with $r \in R$ and $m \in \mathcal{M}(r)$ and $i \subseteq \mathbb{Z}$ is an interval over $\mathbb{Z}$. 
 \end{definition}
 
 
@@ -97,7 +97,23 @@ We define a relation on masked predicate maps that is analogous to the subset-eq
     \end{equation*}
 \end{definition}
 
-\input{chapters/algorithms/eri-lemmas/map-union-subsets}
+\begin{lemma}
+    \label{lem:oplus-and-oplusext}
+    Let $I_1, I_2 \subseteq \mathbb{Z}$ be intervals, and $M$ a masked predicate map.
+    Then $(I_1 \oplus I_2) \oplusext M = I_1 \oplusext (I_2 \oplusext M)$.
+\end{lemma}
+\textit{Proof} This follows directly from the definitions of the two operators.
+We omit a detailed proof.
+
+\begin{lemma}
+    \label{lem:oplusext-zero}
+    Let $M$ be a masked predicate map.
+    Then $\{0\} \oplusext M = M$.
+\end{lemma}
+\textit{Proof} This is a direct consequence of the definition of $\oplusext$.
+Adding zero to every interval in the map obviously does not change the intervals and thus it also does not change the map itself.
+
+\input{chapters/algorithms/eri-lemmas/map-union-subsets.tex}
 
 \begin{definition}
     \label{def:e-rel-int}
@@ -106,26 +122,29 @@ We define a relation on masked predicate maps that is analogous to the subset-eq
         \ERI(\varphi) = \\
         \begin{cases}
             \{\} 
-                & \text{if $\varphi$ is an an atomic formula} \\ &\text{and not a predicate,} \\ 
-            \{p(m) \rightarrow [0,0]\} 
-                & \text{if $\varphi$ is a predicate with name } \\ &\text{$p$ and mask $m$,} \\
+                & \text{if } \varphi \text{ is an atomic formula} \\
+                & \text{and not a predicate,} \\ 
+                \{p(m) \rightarrow [0,0]\} 
+                & \text{if } \varphi \text{ is a predicate with name } \\
+                & p \text{ and mask } m, \\
             \ERI(\psi) 
-                & \text{if $\varphi$ is of the form $\neg \psi, \exists x.\psi$,} \\
-                & \text{or $\forall x.\psi$,} \\
+                & \text{if } \varphi \text{ is of the form } \neg \psi, \exists x.\psi, \\
+                & \text{or } \forall x.\psi, \\
             \ERI(\psi) \Cupmerge \ERI(\chi) 
-                & \text{if $\varphi$ is of the form $\psi \lor \chi$,} \\ & \text{or $\psi \land \chi$,} \\
+                & \text{if } \varphi \text{ is of the form } \psi \lor \chi, \\
+                & \text{or } \psi \land \chi, \\
             (-b,0] \Cupext ((-b,-a] \oplusext \ERI(\psi)) 
-                & \text{if $\varphi$ is of the form $\Previous{[a,b)}\psi$,} \\
+                & \text{if } \varphi \text{ is of the form } \Previous{[a,b)} \psi, \\
             [0,b) \Cupext ([a,b) \oplusext \ERI(\psi)) 
-                & \text{if $\varphi$ is of the form $\Next{[a,b)}$,}\\
+                & \text{if } \varphi \text{ is of the form } \Next{[a,b)} \psi,\\
             (-b,0] \Cupext ((-b,0] \oplusext \ERI(\psi)) \Cupmerge ((-b,-a] \oplusext \ERI(\chi)) 
-                & \text{if $\varphi$ is of the form $\psi \Since{[a,b)} \chi$,} \\
+                & \text{if } \varphi \text{ is of the form } \psi \Since{[a,b)} \chi, \\
             [0,b) \Cupext ([0,b) \oplusext \ERI(\psi)) \Cupmerge ([a,b) \oplusext \ERI(\chi)) 
-                & \text{if $\varphi$ is of the form $\psi \Until{[a,b)} \chi$,} \\
+                & \text{if } \varphi \text{ is of the form } \psi \Until{[a,b)} \chi, \\
             [0,b) \Cupext ([0,b) \oplusext \ERIr(\psi)) 
-                & \text{if $\varphi$ is of the form $\Fregex{[a,b)} \psi$, and}\\
+                & \text{if } \varphi \text{ is of the form } \Fregex{[a,b)} \psi, \text{ and}\\
             (-b,0] \Cupext ((-b,0] \oplusext \ERIr(\psi)) 
-                & \text{if $\varphi$ is of the form $\Pregex{[a,b)} \psi$.}\\
+                & \text{if } \varphi \text{ is of the form } \Pregex{[a,b)} \psi.\\
         \end{cases}
     \end{equation*}
 \end{definition}
@@ -195,13 +214,11 @@ We define an analogous notion of an $MT_{\tau}$- slice which is a more fine-grai
 \begin{definition}
     \label{def:mt-slice}
     Let $T \subseteq \mathbb{Z}$ be an interval,
-        % $\tau \in \mathbb{N}$ a time stamp,
         and $M$ a masked predicate map
             where for all $(m, J) \in M$, $J \subseteq T$.
     And let $(\bar{\mathcal{D}}, \bar{\tau})$ a temporal structure.
     The $MT_{\tau}$- slice of $(\bar{\mathcal{D}}, \bar{\tau})$ is the time slice $(\bar{\mathcal{D}}', \bar{\tau}')$ of $(\bar{\mathcal{D}}, \bar{\tau})$, where $s:[0,l) \to \mathbb{N}$ is the function $s(i') = i' + c, l = |\{i \in \mathbb{N} \mid \tau_i \in T\}|$, and $c = \min\{i \in \mathbb{N} \mid \tau_i \in T \}$. 
     We also require that $\tau_l' \not\in T$ and 
-    % TODO figure out what the reference time stamp is here
     \begin{equation*}
         \mathcal{D}'_{i'} = \filter(M, \mathcal{D}_{s(i')}, \tau_{s(i')}, \tau),
     \end{equation*}
@@ -235,8 +252,6 @@ We define an analogous notion of an $MT_{\tau}$- slice which is a more fine-grai
             for all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_i \in I$,
     \end{enumerate}
 \end{definition}
-% Like with Definition \ref{def:overlapping}, two traces are $(M,T,c,i)$-overlapping if their \textit{filtered} time points are the same on an interval of time stamps.
-% TODO rephrase this previous sentence to more accurately describe (MTci)-overlapping
 
 The next lemma establishes that a trace and its $MT_{\tau_i}$- slice are $(M,T,c,i)$- overlapping.
 It is analogous to Lemma A.2 in Basin et al. \cite{Basin2016}.
