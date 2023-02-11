@@ -1,0 +1,66 @@
+\begin{lemma}
+    \label{lem:eri-overlap-transitivity}
+    Let $(\bar{\mathcal{D}}, \bar{\tau})$
+        and
+        $(\bar{\mathcal{D}}', \bar{\tau}')$ be two temporal structures that are $(M,T,c,i)$-overlapping,
+            for some masked predicate map $M$,
+            $T \subseteq \mathbb{Z}$,
+            $c \in \mathbb{N}$,
+            and $i \in \mathbb{Z}$.
+    Then $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$
+    are $(N, K, c, k)$-overlapping,
+        for each $k \in \mathbb{N}$
+        with $\tau_k - \tau_i \in T$, $K \subseteq \{ \tau_i - \tau_k \} \oplus T$,
+        and $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$.
+    % TODO check that this lemma is complete
+\end{lemma}
+\textit{Proof} 
+% TODO write this proof
+This proof follows a similar structure as the proof of Lemma A.3 in Basin et al. \cite{Basin2016}.
+We first show that Condition 1 in Definition \ref{def:overlapping-ext} is satisfied, i.e.
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
+the following three things hold:
+$j \geq c$,
+$\tau_j = \tau'_{j-c}$,
+and
+$ \filter(N, \mathcal{D}_j, \tau_j, \tau_k) = \filter(N, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_k)$.
+
+For all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
+    it follows that $\tau_j - \tau_k + \tau_k - \tau_i \in \{\tau_k - \tau_i \} \oplus K$,
+    it then follows that $\tau_j - \tau_i \in \{\tau_k - \tau_i\} \oplus K$. 
+From $K \subseteq \{ \tau_i - \tau_k \} \oplus I$,
+    we get $\{\tau_k - \tau_i\} \oplus K \subseteq \{\tau_k - \tau_i \} \oplus \{\tau_i - \tau_k \} \oplus I = I$,
+    or in short $\tau_j - \tau_i \in I$.
+And as we know that $(\bar{\mathcal{D}}, \bar{\tau})$
+    and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,T,c,i)$-overlapping,
+    it follows from Condition 1 in Definition \ref{def:overlapping-ext} that
+    for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
+    $j \geq c$, $\tau_j = \tau'_{j-c}$,
+    and $\filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i)$.
+We are done with Condition 1, if we can show that
+\begin{equation*}
+    \filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i),
+\end{equation*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$ implies 
+\begin{equation*}
+    \filter(N, \mathcal{D}_j, \tau_j, \tau_k) 
+    = \filter(N, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_k),  
+\end{equation*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
+The equality of two filtered structures can be shown that for all predicates $r$,
+$r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)} = r^{\filter(N, \mathcal{D}'_{j'}, \tau_{j'}, \tau_k)}$.
+By Definition \ref{def:filter} an interpretation $x$ is in $r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)}$ iff $\exists p,m,J . ((p,m), J) \in N \land p = r \land m \matches x \land \tau_i - \tau_k \in J$.
+From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any $p,m,J$, with $((p,m), J) \in K$ there exist $p',m',J'$,
+    with $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$,
+    $p=p'$,
+    $m' \nomoreprecise m$,
+    and $J \subseteq J'$.
+From the definition of $\oplusext$ it is apparent that
+$((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$
+iff
+$((p',m'), \{\tau_k - \tau_i\} \oplus J') \in M$ 
+
+$\tau_i - \tau_k \in J$ if $\tau_i - \tau_k \in $
+
+
+\dots

@@ -1,0 +1,199 @@
+\begin{lemma}
+    \label{lem:eri-overlap}
+    Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \phi$.
+\end{lemma}
+This Lemma applies to MFOTL formulas.
+It can be extended to MFODL as well, but it needs a mutually recursive extensions to include regular expressions.
+We focus on the core MFOTL formulas.
+
+\textit{Proof} This proof is in large parts analogous to the one to Lemma A.4 in Basin et al. \cite{Basin2016}, and we follow the same structure. First we note that for the same reason as in Lemma A.4 in Basin et al. \cite{Basin2016}, the lemma's statement is well-defined, as the definition of $\RI(\phi)$ did not change and still includes $0$.
+We proof the lemma by structural induction on the formula $\phi$.
+In this proof $S = (C, R, \iota)$ is a signature, with constants $C$, predicats $R$, and the arity function $\iota$.
+Similarly $V$ is the set of variables.
+We have the following cases.
+
+\begin{itemize}
+    \item 
+        $t \approx t'$, where $t, t' \in V \cup C$. 
+        The satisfaction of $t \approx t'$ depends only on the valuation $v$.
+        Therefore it follows that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models t \approx t'$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c) \models t \approx t'$.
+    \item 
+        $t \prec t'$ and $t \preceq$ are analogous to the first one and their detailed proofs are omitted.
+    \item 
+        $r(\bar{t})$, where $t_1, \dots, t_{\iota(r)} \in V \cup C$. 
+        Since $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping it follows from Condition 1 in Definition \ref{def:overlapping-ext} that 
+        \begin{equation*}
+            \filter(\ERI(\phi), \mathcal{D}_j, \tau_j, \tau_i)
+            = \filter(\ERI(\phi), \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i),
+        \end{equation*}
+        $\tau_j = \tau'_{j-c}$, and $j \geq c$
+        for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in \RI(\phi)$.
+        % We make a case distinction on whether $\tau_j - \tau_i \in \RI(\phi)$.
+        % \begin{itemize}
+            % \item $\tau_j - \tau_i \in \RI(\phi)$.
+                % In this case,
+                By Definition \ref{def:filter}, there exists a valuation $v(\bar{t})$ in $r^{\mathcal{D}_j}$ iff there exist $m,J$, with $((r,m),J) \in \ERI(\phi)$ with $\tau_j - \tau_i \in J$, and $m \matches v(\bar{t})$.
+                And from the equality of the two filters given to us by Condition 1 of Definition \ref{def:overlapping-ext} this is the case iff there exist $m', J'$, with $((r,m'),J') \in \ERI(\phi)$ with $\tau'_{j-c} - \tau_i \in J'$, and $m' \matches v(\bar{t})$ for all valuations $v$.
+                And further this last part holds iff $v(\bar{t}) \in r^{\mathcal{D}'_{j-c}}$.
+                Thus, by Definition, \ref{def:mfotl-evaluation}
+                    $(\bar{\mathcal{D}},\bar{\tau},v,i) \models r(\bar{t})$
+                    iff
+                    $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c) \models r(\bar{t})$.
+        %     \item $\tau_j - \tau_i \not\in \RI(\phi)$.
+        %         In this case it follows from Definition \ref{def:mfotl-evaluation} that
+        % \end{itemize}
+
+    \item 
+        $\neg \psi$. 
+        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping.
+        By definition $\ERI(\neg \psi) = \ERI(\psi)$ and $\RI(\neg \psi) = \RI(\psi)$.
+        By the inductive hypothesis $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ for all valuations $v$.
+        Therefore $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \neg \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \neg \psi$ for all valuations $v$.
+
+    \item 
+        $\psi \lor \chi$.
+        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi) \Cupmerge \ERI(\chi), \RI(\psi) \Cup \RI(\chi), c, i)$-overlapping.
+        From $\ERI(\psi) \subseteqmap \ERI(\psi) \Cupmerge \ERI(\chi)$, $\ERI(\chi) \subseteqmap \ERI(\psi) \Cupmerge \ERI(\chi)$, $\RI(\psi) \subseteq \RI(\psi) \Cup \RI(\chi)$, and $\RI(\chi) \subseteq \RI(\psi) \Cup \RI(\chi)$,
+            it follows from Lemma \ref{lem:eri-overlap-transitivity} that $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i)$- and $(\ERI(\chi), \RI(\chi), c, i)$-overlapping.
+        By the inductive hypothesis, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \chi$.
+        Therefore $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \lor \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \lor \chi$.
+        
+    \item 
+        $\exists x. \psi$.
+        From $\ERI(\exists x. \psi) = \ERI(\psi)$ and $\RI(\exists x. \psi) = \RI(\psi)$ it follows that $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i)$-overlapping.
+        By the inductive hypothesis we have $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ for all valuations $v$.
+        Thus for all $d$, $(\bar{\mathcal{D}}, \bar{\tau}, v[x \mapsto d], i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v[x \mapsto d], i-c) \models \psi$.
+        By Definition \ref{def:mfotl-evaluation} it follows directly that $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \exists x. \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \exists x. \psi$ for all valuations $v$.
+
+    \item
+        $\Previous{[a,b)} \psi$.
+        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\Previous{[a,b)} \psi), \RI(\Previous{[a,b)} \psi), c, i)$- overlapping, where
+        \begin{equation*}
+            \ERI(\Previous{[a,b)} \psi) = (-b,0] \Cupext ((-b,-a] \oplusext \ERI(\psi))
+        \end{equation*}
+        and
+        \begin{equation*}
+            \RI(\Previous{[a,b)} \psi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))
+        \end{equation*}
+        From $0 \in \RI(\Previous{[a,b)} \psi)$ and Condition 1 in Definition \ref{def:overlapping-ext}, it follows that $\tau_i = \tau'_{i-c}$.
+
+        We make a case split on the value of $i$. If $i=0$, then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
+        From $c \in \mathbb{N}, i-c \in \mathbb{N}$, and $i=0$, it follows that $i-c=0$.
+        Since $i-c = 0 = i$ it is trivial that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \Previous{[a,b)} \psi$ for all valuations $v$.
+
+        Next we consider $i > 0$ and make another case split on whether $\tau_i - \tau_{i-1} \in [a,b)$.
+        \begin{itemize}
+            \item 
+                $\tau_i - \tau_{i-1} \in [a,b)$.
+                Then $\tau_{i-1} - \tau_i \in \RI(\Previous{[a,b)} \psi)$ and from Condition 1 in Definition \ref{def:overlapping-ext} it follows that $i-1 \geq c$, $\tau_{i-1} = \tau'_{i-c-1}$, and hence $\tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
+                It further follows that
+                \begin{align*}
+                    \ERI(\psi) 
+                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext \{ \tau_{i-1} - \tau_i \} \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext (-b, -a] \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext \ERI(\Previous{[a,b)} \psi)
+                \end{align*}
+                and
+                \begin{align*}
+                    \RI(\psi) 
+                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus \{ \tau_{i-1} - \tau_i \} \oplus \RI(\psi) \\
+                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus (-b, -a] \oplus \RI(\psi) \\
+                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus \RI(\Previous{[a,b)} \psi).
+                \end{align*}
+                Thus by Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i-1)$- overlapping.
+                By the induction hypothesis $(\bar{\mathcal{D}}, \bar{\tau}, v, i-1) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c-1) \models \psi$ for all valuations $v$.
+                Because $\tau_i = \tau'_{i-c}$ and $\tau_{i-1} = \tau'_{i-c-1}$, it follows that $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \Previous{[a,b)} \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \Previous{[a,b)} \psi$ for all valuations $v$.
+            \item 
+                $\tau_i - \tau_{i-1} \not\in [a,b)$.
+                Then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
+                From Condition 1 of Definition \ref{def:overlapping-ext} we still have $i \geq c$.
+                We make a case distinction on whether $i=c$ or $i>c$.
+                \begin{itemize}
+                    \item
+                        $i=c$.
+                        In this case $i-c = 0$.
+                        Therefore $(\bar{\mathcal{D}}, \bar{\tau}, v, i-c) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
+                    \item
+                        $i>c$.
+                        We proof this case by contradiction.
+                        Assume that $\tau'_{i-c} - \tau'_{i-c-1} = \tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
+                        From Condition 2 in Definition \ref{def:overlapping-ext} it follows that $\tau_{i-1} = \tau'_{i-c-1}$ and hence $\tau_i - \tau_{i-1} = \tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
+                        This contradicts $\tau_i - \tau_{i-1} \not\in [a,b)$, so it must be the case that $\tau'_{i-c} - \tau'_{i-c-1} \not\in [a,b)$.
+                        It follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
+                \end{itemize}
+        \end{itemize}
+    \item
+        $\Next{[a,b)}$.
+        The "next" case is in large parts similar to the one for "previous".
+        Like with Lemma A.4 \cite{Basin2016} it is simpler than "previous", because no special distinctions have to be made for $i=0$ and $i-c=0$.
+    \item
+        $\psi \Since{[a,b)} \chi$.
+        $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\psi \Since{[a,b)} \chi), \RI(\psi \Since{[a,b)} \chi), v, i)$- overlapping, where
+        \begin{align*}
+            \ERI(\psi \Since{[a,b)} \chi)
+            &= (-b,0] \Cupext ((-b,0] \oplusext \ERI(\psi)) \Cupmerge ((-b,-a] \oplusext \ERI(\chi))
+        \end{align*}
+        and
+        \begin{align*}
+            \RI(\psi \Since{[a,b)} \chi)
+            &= (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)).
+        \end{align*}
+        From $0 \in \RI(\psi \Since{[a,b)} \chi)$ and Condition 1 in Definition \ref{def:overlapping-ext} it follows that $\tau_i = \tau'_i-c$.
+
+        First we establish the two following claims.
+        \begin{enumerate}
+            \item
+                For all $j \in \mathbb{N}$ with $j \leq i$ and $\tau_i - \tau_j \in [a,b)$, it holds that 
+                \begin{align*}
+                    \RI(\chi) 
+                    &\subseteq \{ \tau_i - \tau_j \} \oplus \{ \tau_j - \tau_i\} \oplus \RI(\chi) \\
+                    &\subseteq \{\tau_i - \tau_j \} \oplus (-b, -a] \oplus \RI(\chi) \\
+                    &\subseteq \{ \tau_i - \tau_j \} \oplus \RI(\psi \Since{[a,b)} \chi)
+                \end{align*}
+                as well as
+                \begin{align*}
+                    \ERI(\chi) 
+                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \{ \tau_j - \tau_i\} \oplusext \ERI(\chi) \\
+                    &\subseteqmap \{\tau_i - \tau_j \} \oplusext (-b, -a] \oplusext \ERI(\chi) \\
+                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \ERI(\psi \Since{[a,b)} \chi)
+                \end{align*}
+                and $j \geq c$.
+                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\chi), \RI(\chi), c, j)$- overlapping.
+                It then follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$, for all valuations $v$.
+            \item
+                For all $k \in \mathbb{N}$ with $k \leq i$ and $\tau_i - \tau_k \in [0,b)$, it holds that
+                \begin{align*}
+                    \RI(\psi)
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus \{ \tau_k - \tau_i \} \oplus \RI(\psi) \\
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus (-b,0] \oplus \RI(\psi) \\
+                    &\subseteq \{ \tau_i - \tau_k \} \oplus \RI(\psi \Since{[a,b)} \chi) \\
+                \end{align*}
+                as well as
+                \begin{align*}
+                    \ERI(\psi)
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \{ \tau_k - \tau_i \} \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext (-b,0] \oplusext \ERI(\psi) \\
+                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \ERI(\psi \Since{[a,b)} \chi) \\
+                \end{align*}
+                and $k \geq c$
+                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, k)$- overlapping.
+                It follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \psi$ for all valuations $v$.
+        \end{enumerate}
+        We show each direction of the claimed equivalence, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$, for all valuations $v$, separately and start with the direction from left to right.
+        If $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$ then there is some $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ such that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$, for all $k \in [j+1, i+1)$.
+
+        From $\tau_i - \tau_j \in [a,b)$ it follows that $\tau_j - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$ and from Condition 1 in Definition \ref{def:overlapping-ext} it follows that $j \geq c$ and $\tau_j = \tau'_{j-c}$.
+        From Claim (i) and from $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ it follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$.
+
+        For all $k' \in [j+1-c, i+1-c)$, it holds that $\tau'_{k'} - \tau'_{i-c} = \tau'_{k'} - \tau_i \in (-b,0]$ and hence $\tau'_{k'} - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$.
+        % TODO continue
+        From Condition 2 in Definition \ref{def:overlapping-ext} we see that $\tau_{k'+c} = \tau'_{k'}$.
+        From Claim (ii) above and from 
+        \dots
+
+
+    \item
+        $\psi \Until{[a,b)} \chi$.
+        The "Until" case is analogous to the "Since" case.
+\end{itemize}

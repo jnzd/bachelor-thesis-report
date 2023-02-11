@@ -1,0 +1,39 @@
+\begin{lemma}
+    \label{lem:mt-slice-overlap}
+    Let $T \subseteq \mathbb{N}$ and $I \subseteq \mathbb{Z}$ be intervals, 
+    $(\bar{\mathcal{D}}, \bar{\tau})$ a temporal structure, and $(\bar{\mathcal{D}}', \bar{\tau}')$ a $(T \oplusext M, T \oplus I)_{\tau_i}$- slice of $(\bar{\mathcal{D}}, \bar{\tau})$.
+    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$- overlapping, for all $i \in \mathbb{N}$ with $\tau_i \in T$, where $c \in \mathbb{N}$ is the value in Definition \ref{def:overlapping-ext} used by the function $s$ with respect to $(\bar{\mathcal{D}}, \bar{\tau})$ and its slice $(\bar{\mathcal{D}}', \bar{\tau}')$.
+\end{lemma}
+\textit{Proof}
+% TODO change proof to correspond to updated lemma
+This proof follows the same structure as the proof to Lemma A.2 in Basin et al. \cite{Basin2016}.
+The precondition in Definition \ref{def:overlapping-ext}, that every interval in $M$ is contained in the interval $T$, is satisfied, as it is also a precondition for Lemma \ref{lem:mt-slice-overlap}.
+First we show condition 1 in Definition \ref{def:overlapping-ext}.
+For all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T$, $\tau_j \in \{\tau_i\} \oplus T$.
+From $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$ 
+
+
+From Definition \ref{def:mt-slice} it follows that $\tau_{j} \in T$ for all $j \in \{c\} \oplus [0,l)$, because $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$, and $l = |\{k \in \mathbb{N} \mid \tau_k \in T\}|$.
+% As a direct consequence we get $j \geq c$.
+And it also follows from Definition \ref{def:mt-slice} that
+\begin{align*}
+    \mathcal{D}'_{j-c}
+    & = \filter(M, \mathcal{D}_{s(j-c)}, \tau_{s(j-c)}, \tau_i) \\
+    & = \filter(M, \mathcal{D}_{j-c+c}, \tau_{j-c+c}, \tau_i) \\
+    & = \filter(M, \mathcal{D}_{j}, \tau_{j}, \tau_i), 
+\end{align*}
+for all $j \in \mathbb{N}$ with $j-c \in [0,l)$, i.e. for all $j \in \{c\} \oplus [0,l)$, where $l = |\{k \in \mathbb{N} \mid \tau_k \in T \}|$.
+Thus we get
+\begin{align*}
+    \mathcal{D}'_{j-c}
+    & = \filter(M, \mathcal{D}_{j}, \tau_{j}, \tau_i), 
+\end{align*}
+for all $j \in \mathbb{N}$ with $\tau_j \in T$.
+From Lemma \ref{lem:double-filter} we get that
+\begin{align*}
+    \mathcal{D}'_{j-c}
+    &= \filter(M, \mathcal{D}_j, \tau_j, \tau_i) \\
+    &= \filter(M, \filter(M, \mathcal{D}_j, \tau_j, \tau_i), \tau_j, \tau_i) \\
+    &= \filter(M, \mathcal{D}'_{j-c}, \tau_j, \tau_i) \\
+    &= \filter(M, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i) \\
+\end{align*}

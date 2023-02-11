@@ -1,0 +1,16 @@
+\begin{lemma}
+    \label{lem:mask-precision-lemma}
+    Let $m = (m_1, \dots, m_{\iota(r)})$ and $n = (n_1, \dots, n_{\iota(r)})$ be two masks for a predicate $r \in R$ with $m \nomoreprecise n$, where $R$ is part of the signature $S = (C,R,\iota)$.
+    Then for every interpretation $x$, $n \matches x$ implies that also $m \matches x$.
+\end{lemma}
+\textit{Proof} 
+Note the order of appearance of $m$ and $n$ in the implication is different from that in the relation.
+From \ref{def:mask-precision-comparison} it follows that for all $i \in \mathbb{N}$ with $0 \leq i \leq \iota(r)$, either $m_i = n_i$ or $m_i = v$.
+If $n \matches k$ then for all $i \in \mathbb{N}$ with $0 \leq i \leq \iota(r)$ either $n_i = v$ or $n_i = k_i$.
+We now show that for all $i$ with $i \in \mathbb{N}$ and $0 \leq i \leq \iota(r)$ it also holds that either $m_i = k_i$ or $m_i = v$ by making a case distinction on the two possible values for each $n_i$.
+We make a case distinction on these two options
+\begin{itemize}
+    \item $n_i = v$. In this case $m_i = v$ which satisfies one of the two options of $m_i = k_i$ or $m_i = v$.
+    \item $n_i = k_i$. In this case $m=n_i$ or $m=v$ are both possible, but for both options either $m=n_i=k_i$ or $m=v$.
+\end{itemize}
+We can thus conclude that for all $i \in \mathbb{N}$ with $0 \leq i \leq \iota(r)$, $m_i = k_i$ or $m_i = v$ and thus $m \matches k$.

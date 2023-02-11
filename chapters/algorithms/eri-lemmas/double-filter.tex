@@ -1,0 +1,32 @@
+\begin{lemma}
+    \label{lem:double-filter}
+    Let $\mathcal{D}$ be a structure, let $M$ be a masked predicate map and let $\tau_i, \tau_J \in \mathbb{N}$ be two time stamps.
+    Then 
+    \begin{equation*}
+        \filter(M, \filter(M, \mathcal{D}, \tau_i, \tau_j), \tau_i, \tau_j) = \filter(M, \mathcal{D}, \tau_i, \tau_j).
+    \end{equation*}
+\end{lemma}
+%TODO update proof for new definition of filter
+\textit{Proof} From Definition \ref{def:filter} we have that the constant interpretations remain unchanged by the filter operation.
+It remains to show that the left-hand side (LHS) and the right-hand side (RHS) in Lemma \ref{lem:double-filter} have the same interpretations for predicates.
+By Definition \ref{def:filter} we have 
+for all $r \in R$,
+\begin{equation*}
+    r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} 
+    = \{v(\bar{t}) \in r^{\mathcal{D}} \mid 
+        \exists ((p,m), I) \in M. 
+            p = r 
+            \land m \matches v(\bar{t}) 
+            \land \tau_i - \tau_j \in I \}.
+\end{equation*}
+And also for all $r \in R$,
+\begin{align*}
+    &r^{\filter(M, \filter(M, \mathcal{D}, \tau_i, \tau_j), \tau_i, \tau_j)} \\
+    &= \{v(\bar{t}) \in r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} \mid 
+        \exists ((p,m), I) \in M. 
+            p = r 
+            \land m \matches v(\bar{t}) 
+            \land \tau_i - \tau_j \in I \}.
+\end{align*}
+From this it is apparent that the second set of interpretations, the one filtered twice is a subset of the first one.
+Further by them having the same conditional part, if an interpretation $v(\bar{t})$ is in $r^{\mathcal{D}}$ it must also be in $r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)}$, because it must have already satisfied the same condition to be in $r^{\mathcal{D}}$.

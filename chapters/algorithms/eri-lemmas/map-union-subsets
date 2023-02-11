@@ -1,0 +1,16 @@
+\begin{lemma}
+    \label{lem:map-union-subsets}
+    Let $M$ and $N$ be masked predicate maps, then
+    \begin{equation*}
+        M \subseteqmap M \Cupmerge N
+    \end{equation*}
+    and
+    \begin{equation*}
+        N \subseteqmap M \Cupmerge N.
+    \end{equation*}
+\end{lemma}
+\textit{Proof}
+Since the definition of $M \Cupmerge N$ is symmetric, it suffices to show on of the two relations in the lemma.
+From Definition \ref{def:e-rel-int-ops} it follows that any key consisting of a predicate and a mask is also in $M \Cupmerge N$.
+Since the mask is there unaltered, it satisfies the condition of being no more precise than the one in $M$.
+The condition for $(I \subseteq I')$ is apparent from the definition as well, no interval is discarded and all intervals are either enlarged by the special union of intervals or kept the same.

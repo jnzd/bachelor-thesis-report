@@ -38,9 +38,8 @@ Let $\mathcal{M}(r)$ be the set of possible masks for a predicate $r$.
 
 \begin{definition}
     \label{def:mask-precision-comparison}
-    Let $m_1=(m_{11}, \dots, m_{1\iota(r)})$ and $m_2=(m_{21}, \dots, m_{2\iota(r)})$ be two masks for the same predicate $r$.
-    We say $m_1$ is at most as precise as $m_2$ if for all $j \in [1,\iota(r)]$, $m_{1j} = v$ or $m_{1j} = m_{2j}$.
-    We write $m_1 \preceq_{\text{mask\_precision}} m_2$ for "$m_1$ is at most as precise as $m_2$.
+    Let $m = (m_1, \dots, m_{\iota(r)})$ and $n = (n_1, \dots, n_{\iota(r)})$ be two masks for a predicate $r \in R$, where $R$ is part of the signature $S = (C,R,\iota)$.
+    $m \nomoreprecise n$ denotes that $m$ is no more precise than $n$, i.e. for all $i \in \mathbb{N}$ with $0 \leq i \leq \iota(r)$, $m_i = n_i$ or $m_i = v$.
 \end{definition}
 
 We use a map data structure to store the predicates, masks, and their respective relative intervals.
@@ -79,12 +78,12 @@ On this data structure we define the operators $\Cupmerge$, $\Cupext$ and $\oplu
     \end{align*}
 \end{definition}
 
-The notation $p(l) \rightarrow I$ denotes an element in an masked predicate map.
-It is equivalend to the notation $((p,l), I)$, but it better shows how we are working with a map.
+The notation $p(l) \rightarrow I$ denotes an element in a masked predicate map.
+It is equivalent to the notation $((p,l), I)$, but it better shows how we are working with a map.
 The $\keys$ operator gives all the first elements, the predicate name and mask tuples, in a masked predicate map.
 With the help of the operators $\Cupmerge$, $\Cupext$ and $\oplusext$ we now give a recursive definition for our extension of relative intervals.
 
-We define a relation on masked predicat maps that is analogous to the subset-equals relation for intervals and illustrates that one map is contained in another.
+We define a relation on masked predicate maps that is analogous to the subset-equals relation for intervals and illustrates that one map is contained in another.
 
 \begin{definition}
     \label{def:subseteqmap}
@@ -94,27 +93,11 @@ We define a relation on masked predicat maps that is analogous to the subset-equ
     \end{equation*}
     if for all $((p,l) \to I) \in N$ there exists $((p',l') \to I') \in M$ with
     \begin{equation*}
-        (p = p') \land (l' \preceq_{\text{mask\_precision}} l) \land (I \subseteq I')
+        (p = p') \land (l' \nomoreprecise l) \land (I \subseteq I')
     \end{equation*}
 \end{definition}
 
-\begin{lemma}
-    \label{lem:map-union-subsets}
-    Let $M$ and $N$ be masked predicate maps, then
-    \begin{equation*}
-        M \subseteqmap M \Cupmerge N
-    \end{equation*}
-    and
-    \begin{equation*}
-        N \subseteqmap M \Cupmerge N.
-    \end{equation*}
-\end{lemma}
-\textit{Proof}
-Since the definition of $M \Cupmerge N$ is symmetric, it suffices to show on of the two relations in the lemma.
-From Definition \ref{def:e-rel-int-ops} it follows that any key consisting of a predicate and a mask is also in $M \Cupmerge N$.
-Since the mask is there unaltered, it satisfies the condition of being no more precise than the one in $M$.
-The condition for $(I \subseteq I')$ is apparant from the definition as well, no interval is discarded and all intervals are either enlarged by the special union of intervals or kept the same.
-
+\input{chapters/algorithms/eri-lemmas/map-union-subsets}
 
 \begin{definition}
     \label{def:e-rel-int}
@@ -162,409 +145,126 @@ And for regular expressions we define
     \end{equation*}
 \end{definition}
 
-% \begin{definition}
-%     \label{def:e-filter}
-%     We call fine-grained filtering of a trace $\sigma=((\tau_i,D_i))_i$ according to the <name of your datastructure> X the trace 
-    
-%     \begin{equation*}
-%         \filter'(\sigma, X, j) = ....
-%     \end{equation*}
-% \end{definition} 
-
-% \begin{theorem}
-%     \label{theo:e-filter-correctness}
-%     For all $\sigma, v, i$:
-%     \begin{equation*}
-%         \sigma, v, i \models \varphi 
-%         \Leftrightarrow \filter'(\sigma, \ERI(\phi), i), v, i \models \varphi
-%     \end{equation*}
-% \end{theorem} 
 
 \subsection{Correctness}
 Analogously to regular intervals we want to use the extended relative intervals to extract (slice) a sub trace from a larger trace for a given formula that has the property that the sub trace is sufficient to evaluate the formula.
-We first need a few definitions and lemmata before we can proof this property.
+We first need a few definitions and lemmas before we can proof this property.
 \begin{definition}
     \label{def:matching-predicate}
-    Let $\mathcal{D}$ be a structure over the signature $S = (C,R,\iota)$, $r^{\mathcal{D}} \in |\mathcal{D}|$ the set of interprations for the predicate $r \in R$, and $m$ a mask for $r$.
+    Let $\mathcal{D}$ be a structure over the signature $S = (C,R,\iota)$, $r^{\mathcal{D}} \in |\mathcal{D}|$ the set of interpretations for the predicate $r \in R$, and $m$ a mask for $r$.
     The arity of $r$, $\iota(r)$ is the same as the length of the mask $m$, $|m|$.
-    The mask $m = (m_1, \dots, m_{\iota(r)})$ matches the interpretation $k = (k_1, \dots, k_{\iota(r)}) \in r^{\mathcal{D}}$ if for all $i \in [1,\iota(r)]$ either $m_i = v$ or $m_i = k_i$, where $v$ is again the place holder value for variable values.
+    The mask $m = (m_1, \dots, m_{\iota(r)})$ matches the interpretation $k = (k_1, \dots, k_{\iota(r)}) \in r^{\mathcal{D}}$ if for all $i \in [1,\iota(r)]$ either $m_i = v$ or $m_i = k_i$, where $v$ is again the placeholder value for variable values.
+    We write $m \matches k$ for $m$ matches $k$.
 \end{definition}
+
+\input{chapters/algorithms/eri-lemmas/mask-precision-lemma.tex}
+
 \begin{definition}
     \label{def:filter}
-    Let $M$ be a masked predicate map $\tau \in \mathbb{N}$ a time stamp and $\mathcal{D}$ a structure over the signature $S = (C,R,\iota)$.
+    Let $M$ be a masked predicate map, $\tau_i, tau_j \in \mathbb{N}$ two time stamps, and $\mathcal{D}$ a structure over the signature $S = (C,R,\iota)$.
     Let $\mathbb{D}$ be the set of all structures over the signature $S$.
-    $\filter(M, \tau,\mathcal{D}) : \mathbb{D} \to \mathbb{D}$ is a function only keeping interprations in $r^{\mathcal{D}} \in |\mathcal{D}|$ that have a matching predicate mask $m$ and relative interval $I$, $(m,I) \in M$ with $\tau \in I$ as well as constant interpretations $c^{\mathcal{D}} \in |\mathcal{D}|$.
-    Concretely $r^{\filter(M, \tau, \mathcal{D})} = \{v(\bar{t}) \in r^{\mathcal{D}} \mid \exists ((p,m), I) \in M. p = r \land m \text{ "matches" } \bar{t} \land \tau \in I \}$.
-\end{definition}
-The following lemma states that filtering a structure twice has the same effect as filtering once.
-\begin{lemma}
-    \label{lem:double-filter}
-    Let $\mathcal{D}$ be a structure, let $M$ be a masked predicate map and let $\tau \in \mathbb{N}$ be a time stamp.
-    Then $\filter(M, \tau ,\filter(M, \tau, \mathcal{D})) = \filter(M, \tau, \mathcal{D})$.
-\end{lemma}
-\textit{Proof} From Definition \ref{def:filter} we have that the constant interpretations remain untouched by the filter operation.
-It remains to show that the left hand side (LHS) and the right hand side (RHS) in Lemma \ref{lem:double-filter} have the same interpretations for predicates.
-The RHS only contains interpretations for predicates from $\mathcal{D}$ that have a matching mask for which its relative interval contains $\tau$.
-The LHS contains interpretations fullfilling the same constraint, but they are "sampled" from the structure $\filter(M,\tau,\mathcal{D})$ instead of $\mathcal{D}$ directly.
-But we already established that all predicate interpretations in the filtered structure (RHS) do fullfill the condition that they have a matching mask in $M$ whose relative interval contains $\tau$.
-Therefore the LHS and RHS are equivalent and the Lemma holds.
-
-
-% \begin{definition}
-%     \label{def:filter-trace}
-%     Let $(\bar{\mathcal{D}}, \bar{\tau}) = ((\mathcal{D}_1, \dots, \mathcal{D}_n), (\tau_1, \dots, \tau_n))$ be a temporal structure and let $M$ be a masked predicate map.
-%     Then
-%     \begin{equation*}
-%         \filtertrace(M, \bar{\tau}, \bar{\mathcal{D}}) = ((\filter(M, \tau_1, \mathcal{D}_1), \dots, \filter(M, \tau_n, \mathcal{D}_n)), (\tau_1, \dots, \tau_n))   
-%     \end{equation*}
-%     is the temporal structure with all its structures filtered by $M$.
-% \end{definition}
-
-% \begin{lemma}
-%     \label{lem:double-filter-trace}
-%     Let $(\bar{\mathcal{D}}, \bar{\tau})$ be a temporal structure and let $M$ be a masked predicate map.
-%     Then 
-%     \begin{equation*}
-%         \filtertrace(M, \bar{\tau} ,\filtertrace(M, \bar{\tau}, \bar{\mathcal{D}})) = \filtertrace(M, \bar{\tau}, \bar{\mathcal{D}}).
-%     \end{equation*}
-% \end{lemma}
-% \textit{Proof} This follows directly from Lemma \ref{lem:double-filter}.
-
-\begin{lemma}
-    \label{lem:eri-predicate-satisfaction1}
-    Let $\mathcal{D}$ be a time point of some trace, where $\mathcal{D}$ is a structure over the signature $S = (C,R,\iota)$ and let $r \in R$ be a predicate. 
-    Then 
+    $\filter(M, \mathcal{D}, \tau_i, \tau_j) : \mathbb{D} \to \mathbb{D}$ is a function filtering the structure $\mathcal{D}$ on the condition whether $\tau_i$ is in the relative intervals of the masked predicates in $M$ shifted by $\tau_j$.
+    Constant interpretations remain unchanged by the the filtering.
+    Concretely for all $r \in R$, 
     \begin{equation*}
-        v(\bar{t}) \in r^{\mathcal{D}}
-        \text{ iff }
-        v(\bar{t}) \in r^{\filter(\ERI(r(\bar{t})), 0, \mathcal{D})},
+        r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} 
+        = \{v(\bar{t}) \in r^{\mathcal{D}} \mid 
+            \exists ((p,m), I) \in M. 
+                p = r \land m \matches v(\bar{t}) 
+                \land \tau_i - 
+                \tau_j \in I \}.
     \end{equation*}
-    where $\bar{t} = (t_1, \dots, t_{\iota(r)})$, and $v(\bar{t}) = (v(t_1), \dots, v(t_{\iota(r)}))$.
-\end{lemma}
-\textit{Proof} 
-This Lemma follows fairly directly from Definition \ref{def:filter} and Definition \ref{def:e-rel-int}.
-The extended relative interval of $r(\bar{t})$, $\ERI(r(\bar{t})) = \{r(\mask(\bar{t})) \to [0,0]\}$.
-Thus there is a predicate and a mask in $\ERI(r(\bar{t}))$ that do match $r(\bar{t})$ with the interval $[0,0]$ of which $0$ is trivially an element of.
+\end{definition}
+Intuitively $\tau_j$ can be seen as the reference time stamp and we check whether a time stamp $\tau_i$ lies inside the relative intervals from the perspective of $\tau_j$.
+The following lemma states that filtering a structure twice has the same effect as filtering once.
 
-% \begin{lemma}
-%     \label{lem:eri-predicate-satisfaction2}
-%     Let $(\bar{\mathcal{D}}, \bar{\tau})$ be a temporal structure over the signature $S = (C,R,\iota)$, and $r \in R$ a predicate.
-%     Then $((\bar{\mathcal{D}}, \bar{\tau}), v, i) \models r$ iff $(\filtertrace(\ERI(r), \bar{\tau}, \bar{\mathcal{D}}), v, i) \models r$ for any valuation $v$ and $i \in \mathbb{N}$.
+\input{chapters/algorithms/eri-lemmas/double-filter.tex}
 
-% \end{lemma}
-% \textit{Proof} \dots
 
+Basin et al. \cite{Basin2016} defines a \textit{slice} of a temporal structure in Definition 3.1.
+We restate this definition here.
+(In the definition $R$ is part of a signature $S=(C,R,\iota)$.)
+\begin{definition}
+    \label{def:slice}
+    Let $s : [0,l) \to \mathbb{N}$ be a strictly increasing function, with $l \in \mathbb{N} \cup \{\infty\}$.
+    The temporal structure $(\bar{\mathcal{D}}', \bar{\tau}')$ is a \textit{slice} of $(\bar{\mathcal{D}}, \bar{\tau})$ (with respect to the function $s$) if $\tau_{i'} = \tau_{s(i)}$ and $r^{\mathcal{D}'_i} \subseteq r^{\mathcal{D}_{s(i)}}$, for all $i \in [0,l)$ and all $r \in R$.
+\end{definition}
+
+Basin et al. \cite{Basin2016} further defines a $T$-slice in Definition A.2 for slicing a temporal structure in a temporal manner.
+We define an analogous notion of an $MT_{\tau}$- slice which is a more fine-grained way of slicing that makes use of masked predicate maps.
 \begin{definition}
     \label{def:mt-slice}
-    Let $T \subseteq \mathbb{Z}$ be an interval and $M$ be a masked predicate map where for all $(m, J) \in M$, $J \subseteq T$.
-    And let $(\bar{\mathcal{D}}, \bar{\tau})$ a trace.
-    The MT-slice of $(\bar{\mathcal{D}}, \bar{\tau})$ is the time slice $(\bar{\mathcal{D}}', \bar{\tau}')$ of $(\bar{\mathcal{D}}, \bar{\tau})$, where $s:[0,l) \to \mathbb{N}$ is the function $s(i') = i' + c, l = |\{i \in \mathbb{N} \mid \tau_i \in T\}|$, and $c = \min\{i \in \mathbb{N} \mid \tau_i \in T \}$. 
-    We also require that $\tau_l' \not\in T$ and $\mathcal{D}'_{i'} = \filter(M, \tau_{s(i')}, \mathcal{D}_{s(i')})$, for all $i' \in [0,l)$.
+    Let $T \subseteq \mathbb{Z}$ be an interval,
+        % $\tau \in \mathbb{N}$ a time stamp,
+        and $M$ a masked predicate map
+            where for all $(m, J) \in M$, $J \subseteq T$.
+    And let $(\bar{\mathcal{D}}, \bar{\tau})$ a temporal structure.
+    The $MT_{\tau}$- slice of $(\bar{\mathcal{D}}, \bar{\tau})$ is the time slice $(\bar{\mathcal{D}}', \bar{\tau}')$ of $(\bar{\mathcal{D}}, \bar{\tau})$, where $s:[0,l) \to \mathbb{N}$ is the function $s(i') = i' + c, l = |\{i \in \mathbb{N} \mid \tau_i \in T\}|$, and $c = \min\{i \in \mathbb{N} \mid \tau_i \in T \}$. 
+    We also require that $\tau_l' \not\in T$ and 
+    % TODO figure out what the reference time stamp is here
+    \begin{equation*}
+        \mathcal{D}'_{i'} = \filter(M, \mathcal{D}_{s(i')}, \tau_{s(i')}, \tau),
+    \end{equation*}
+    for all $i' \in [0,l)$.
 \end{definition}
 
 
 \begin{definition}
     \label{def:overlapping-ext}
-    Let $T \subseteq \mathbb{Z}$ be an interval and $M$ be a masked predicate map where for all $(m, J) \in M$, $J \subseteq T$.
+    Let $I \subseteq \mathbb{Z}$ be an interval, and $M$ be a masked predicate map where for all $(m, J) \in M$, $J \subseteq I$.
     Let $c,i \in \mathbb{N}$.
-    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,T,c,i)$-overlapping if the following conditions hold:
+    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$-overlapping if the following conditions hold:
     \renewcommand{\labelenumi}{\arabic{enumi}.}
     \begin{enumerate}
-        \item $j \geq c$, $\filter(M, \tau_j, \mathcal{D}_j)=\filter(M, \tau'_{j-c}, \mathcal{D}'_{j-c})$ and $\tau_j = \tau'_{j-c}$, for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T$,
-        \item $\filter(M, \tau_{j' + c}, \mathcal{D}_{j' + c})=\filter(M, \tau'_{j'}, \mathcal{D}'_{j'})$ and $\tau_{j' + c} = \tau'_{j'}$, for all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_i \in T$,
+        \item 
+            $j \geq c$,
+            $\tau_j = \tau'_{j-c}$,
+            and
+            \begin{equation*}
+                \filter(M, \mathcal{D}_j, \tau_j, \tau_i)
+                = \filter(M, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i)
+            \end{equation*}
+            for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$,
+        \item
+            $\tau_{j'+c} = \tau'_{j'}$,
+            and
+            \begin{equation*}
+                \filter(M, \mathcal{D}_{j'+c}, \tau_{j'+c}, \tau_i)
+                = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i)
+            \end{equation*}
+            for all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_i \in I$,
     \end{enumerate}
 \end{definition}
-Like with Definition \ref{def:overlapping}, two traces are $(M,T,c,i)$-overlapping if their \textit{filtered} time points are the same on an interval of time stamps.
-The next lemma establishes that a trace and an $MT$-slice of that trace are $(M,T,c,i)$-overlapping.
+% Like with Definition \ref{def:overlapping}, two traces are $(M,T,c,i)$-overlapping if their \textit{filtered} time points are the same on an interval of time stamps.
+% TODO rephrase this previous sentence to more accurately describe (MTci)-overlapping
+
+The next lemma establishes that a trace and its $MT_{\tau_i}$- slice are $(M,T,c,i)$- overlapping.
 It is analogous to Lemma A.2 in Basin et al. \cite{Basin2016}.
-\begin{lemma}
-    \label{lem:mt-slice-overlap}
-    Let $T \subseteq \mathbb{Z}$ be an interval and let $M$ be a masked predicate map where for all $(m,I) \in M$, $I \subseteq T$.
-    Let $(\bar{\mathcal{D}}, \bar{\tau})$ a trace, and $(\bar{\mathcal{D}}', \bar{\tau}')$ a $(M, T)$-slice of $(\bar{\mathcal{D}}, \bar{\tau})$.
-    The traces $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,T,c,i)$-overlapping, for all $i \in \mathbb{N}$ with $\tau_i \in T$, where $c \in \mathbb{N}$ is the value in Definition \ref{def:mt-slice} used by the function $s$.
-\end{lemma}
-\textit{Proof}
-% TODO change proof to correspond to updated lemma
-The precondition in Definition \ref{def:overlapping-ext}, that for all intervals in $M$ are a subset of the larger interval $T$ is satisfied, as it is also a precondition for Lemma \ref{lem:mt-slice-overlap}.
-First we show condition 1 in Definition \ref{def:overlapping-ext}.
-\dots
+% It is partially analogous to Lemma A.2 in Basin et al. \cite{Basin2016}.
+% It however makes a less general statement about $MT_{\tau_i}$- slices and $(M,T,c,i)$- overlapping than Lemma A.2 makes about $T$- slices and $(I,c,i)$- overlapping.
+
+\input{chapters/algorithms/eri-lemmas/slice-overlap.tex}
 
 
-Analogous to Lemma A.3 in Basin et al. \cite{Basin2016} the following Lemma states that any overlapping traces still overlap, also overlap on parts of of the overlapping section.
-\begin{lemma}
-    \label{lem:eri-overlap-transitivity}
-    Let $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ be two traces that are $(M,T,c,i)$-overlapping, for some masked predicate map $M$, some $T \subseteq \mathbb{Z}$, $c \in \mathbb{N}$, and $i \in \mathbb{Z}$.
-    Then $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(N, K, c, k)$-overlapping, for each $k \in \mathbb{N}$ with $\tau_k - \tau_i \in T$, $K \subseteq \{ \tau_i - \tau_k \} \oplus T$, and $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$.
-    % TODO check that this lemma is complete
-\end{lemma}
-\textit{Proof} 
-% TODO write this proof
-\dots
+Analogous to Lemma A.3 in Basin et al. \cite{Basin2016} the following Lemma states that any overlapping traces also overlap on parts of the overlapping section.
 
-With this we get to the key Lemma that we rely on to make our optimization when selecting and querying a subtrace from the database.
+\input{chapters/algorithms/eri-lemmas/overlap-transitivity.tex}
+
+With this we get to the key Lemma that we rely on to make our optimization when selecting and querying a sub-trace from the database.
 It is analogous to Lemma A.4 in Basin et al. \cite{Basin2016}.
 
-\begin{lemma}
-    \label{lem:eri-overlap}
-    Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
-    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \phi$.
-\end{lemma}
-This Lemma applies to MFOTL formulas.
-It can be extended to MFODL as well, but it needs a mutually recursive extensions to include regular expressions.
-We focus on the core MFOTL formulas.
-
-\textit{Proof} This proof is in large parts analogous to the one to Lemma A.4 in Basin et al. \cite{Basin2016}. First we note that for the same reason as in Lemma A.4 in Basin et al. \cite{Basin2016}, the lemma's statement is well-defined, as the definition of $\RI(\phi)$ did not change and still includes $0$.
-We proof the lemma by structural induction on the formula $\phi$.
-In this proof $S = (C, R, \iota)$ is a signature, with constants $C$, predicats $R$, and the arity function $\iota$.
-Similarly $V$ is the set of variables.
-We have the following cases.
-
-\begin{itemize}
-    \item 
-        $t \approx t'$, where $t, t' \in V \cup C$. 
-        The satisfaction of $t \approx t'$ depends only on the valuation $v$.
-        Therefore it follows that $(\bar{\mathcal{D}},\bar{\tau},v,i) \models t \approx t'$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c) \models t \approx t'$.
-    \item 
-        $t \prec t'$ and $t \preceq$ are analogous to the first one and their detailed proofs are ommitted.
-    \item 
-        $r{\bar(t)}$, where $t_1, \dots, t_{\iota(r)} \in V \cup C$. 
-        Since $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping it follows from Condition 1 in Definition \ref{def:overlapping-ext} that 
-        \begin{equation*}
-            \filter(\ERI(\phi), \tau_i, \mathcal{D}_i) = \filter(\ERI(\phi), \tau'_{i-c} \mathcal{D}'_{i-c})
-        \end{equation*}
-        and
-        \begin{equation*}
-            \tau_i = \tau'_{i-c}.
-        \end{equation*}
-        From Lemma \ref{lem:eri-predicate-satisfaction1} it follows that 
-        \begin{equation*}
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\mathcal{D}_i}
-            \text{ iff }
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\filter(\ERI(r(\bar{t})), \tau_i, \mathcal{D}_i)}.
-        \end{equation*}
-        And similarly
-        \begin{equation*}
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\mathcal{D}'_{i-c}}
-            \text{ iff }
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\filter(\ERI(r(\bar{t})), \tau'_{i-c}, \mathcal{D}'_{i-c})}.
-        \end{equation*}
-        From this and Definiton \ref{def:mfotl-evaluation} it follows that 
-        \begin{align*}
-            (\bar{\mathcal{D}}, \bar{\tau}, v, i) \models r(\bar{t})
-            &\text{ iff } 
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\mathcal{D}_i} \\
-            &\text{ iff }
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\filter(\ERI(r(\bar{t})), \tau_i, \mathcal{D}_i)} = r^{\filter(\ERI(r(\bar{t})), \tau'_{i-c}, \mathcal{D}'_{i-c})}.
-        \end{align*}
-        It further follows that 
-        \begin{align*}
-            (\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models r
-            &\text{ iff }
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\mathcal{D}'_{i-c}} \\
-            &\text{ iff }
-            (v(t_1), \dots, v(t_{\iota(r)})) \in r^{\filter(\ERI(r), \tau'_{i-c}, \mathcal{D}'_{i-c})} = r^{\filter(\ERI(r(\bar{t})), \tau_i, \mathcal{D}_i)}.
-        \end{align*}
-        Thus
-        \begin{align*}
-            (\bar{\mathcal{D}}, \bar{\tau}, v, i) \models r(\bar{t})
-            &\text{ iff }
-            (\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models r(\bar{t})
-        \end{align*}
-        holds for all valuations $v$ and $i \in \mathbb{N}$.
-
-    \item 
-        $\neg \psi$. 
-        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\phi), \RI(\phi), c, i)$-overlapping.
-        By definition $\ERI(\neg \psi) = \ERI(\psi)$ and $\RI(\neg \psi) = \RI(\psi)$.
-        By the inductive hypothesis $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ for all valuations $v$.
-        Therfore $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \neg \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \neg \psi$ for all valuations $v$.
-
-    \item 
-        $\psi \lor \chi$.
-        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi) \Cupmerge \ERI(\chi), \RI(\psi) \Cup \RI(\chi), c, i)$-overlapping.
-        % TODO define subseteqmap
-        % TODO define analogous lemma to Lemma A.3
-        From $\ERI(\psi) \subseteqmap \ERI(\psi) \Cupmerge \ERI(\chi)$, $\ERI(\chi) \subseteqmap \ERI(\psi) \Cupmerge \ERI(\chi)$, $\RI(\psi) \subseteq \RI(\psi) \Cup \RI(\chi)$, and $\RI(\chi) \subseteq \RI(\psi) \Cup \RI(\chi)$,
-            it follows from Lemma \ref{lem:eri-overlap-transitivity} that $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i)$- and $(\ERI(\chi), \RI(\chi), c, i)$-overlapping.
-        By the inductive hypothesis, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \chi$.
-        Therefore $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \lor \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \lor \chi$.
-        
-    \item 
-        $\exists x. \psi$.
-        From $\ERI(\exists x. \psi) = \ERI(\psi)$ and $\RI(\exists x. \psi) = \RI(\psi)$ it follows that $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i)$-overlapping.
-        By the inductive hypothesis we have $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi$ for all valuations $v$.
-        Thus for all $d$, $(\bar{\mathcal{D}}, \bar{\tau}, v[x \mapsto d], i) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v[x \mapsto d], i-c) \models \psi$.
-        By Definition \ref{def:mfotl-evaluation} it follows directly that $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \exists x. \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \exists x. \psi$ for all valuations $v$.
-
-    \item
-        $\Previous{[a,b)} \psi$.
-        $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\Previous{[a,b)} \psi), \RI(\Previous{[a,b)} \psi), c, i)$- overlapping, where
-        \begin{equation*}
-            \ERI(\Previous{[a,b)} \psi) = (-b,0] \Cupext ((-b,-a] \oplusext \ERI(\psi))
-        \end{equation*}
-        and
-        \begin{equation*}
-            \RI(\Previous{[a,b)} \psi) = (-b,0] \Cup ((-b,-a] \oplus \RI(\psi))
-        \end{equation*}
-        From $0 \in \RI(\Previous{[a,b)} \psi)$ and Condition 1 in Definition \ref{def:overlapping-ext}, it follows that $\tau_i = \tau'_{i-c}$.
-
-        We make a case split on the value of $i$. If $i=0$, then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
-        From $c \in \mathbb{N}, i-c \in \mathbb{N}$, and $i=0$, it follows that $i-c=0$.
-        Since $i-c = 0 = i$ it is trivial that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \Previous{[a,b)} \psi$ for all valuations $v$.
-
-        Next we consider $i > 0$ and make another case split on whether $\tau_i - \tau_{i-1} \in [a,b)$.
-        \begin{itemize}
-            \item 
-                $\tau_i - \tau_{i-1} \in [a,b)$.
-                Then $\tau_{i-1} - \tau_i \in \RI(\Previous{[a,b)} \psi)$ and from Condition 1 in Definition \ref{def:overlapping-ext} it follows that $i-1 \geq c$, $\tau_{i-1} = \tau'_{i-c-1}$, and hence $\tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
-                It further follows that
-                \begin{align*}
-                    \ERI(\psi) 
-                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext \{ \tau_{i-1} - \tau_i \} \oplusext \ERI(\psi) \\
-                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext (-b, -a] \oplusext \ERI(\psi) \\
-                    &\subseteqmap \{\tau_i - \tau_{i-1} \} \oplusext \ERI(\Previous{[a,b)} \psi)
-                \end{align*}
-                and
-                \begin{align*}
-                    \RI(\psi) 
-                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus \{ \tau_{i-1} - \tau_i \} \oplus \RI(\psi) \\
-                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus (-b, -a] \oplus \RI(\psi) \\
-                    &\subseteq \{\tau_i - \tau_{i-1} \} \oplus \RI(\Previous{[a,b)} \psi).
-                \end{align*}
-                Thus by Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, i-1)$- overlapping.
-                By the induction hypothesis $(\bar{\mathcal{D}}, \bar{\tau}, v, i-1) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c-1) \models \psi$ for all valuations $v$.
-                Because $\tau_i = \tau'_{i-c}$ and $\tau_{i-1} = \tau'_{i-c-1}$, it follows that $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \Previous{[a,b)} \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \Previous{[a,b)} \psi$ for all valuations $v$.
-            \item 
-                $\tau_i - \tau_{i-1} \not\in [a,b)$.
-                Then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
-                From Condition 1 of Definition \ref{def:overlapping-ext} we still have $i \geq c$.
-                We make a case distinction on whether $i=c$ or $i>c$.
-                \begin{itemize}
-                    \item
-                        $i=c$.
-                        In this case $i-c = 0$.
-                        Therefore $(\bar{\mathcal{D}}, \bar{\tau}, v, i-c) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
-                    \item
-                        $i>c$.
-                        We proof this case by contradiction.
-                        Assume that $\tau'_{i-c} - \tau'_{i-c-1} = \tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
-                        From Condition 2 in Definition \ref{def:overlapping-ext} it follows that $\tau_{i-1} = \tau'_{i-c-1}$ and hence $\tau_i - \tau_{i-1} = \tau'_{i-c} - \tau'_{i-c-1} \in [a,b)$.
-                        This contradicts $\tau_i - \tau_{i-1} \not\in [a,b)$, so it must be the case that $\tau'_{i-c} - \tau'_{i-c-1} \not\in [a,b)$.
-                        It follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \Previous{[a,b)} \psi$, for all valuations $v$.
-                \end{itemize}
-        \end{itemize}
-    \item
-        $\Next{[a,b)}$.
-        The "next" case is in large parts similar to the one for "previous".
-        Like with Lemma A.4 \cite{Basin2016} it is simpler than "previous", because no special distinctions have to be made for $i=0$ and $i-c=0$.
-    \item
-        $\psi \Since{[a,b)} \chi$.
-        $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\psi \Since{[a,b)} \chi), \RI(\psi \Since{[a,b)} \chi), v, i)$- overlapping, where
-        \begin{align*}
-            \ERI(\psi \Since{[a,b)} \chi)
-            &= (-b,0] \Cupext ((-b,0] \oplusext \ERI(\psi)) \Cupmerge ((-b,-a] \oplusext \ERI(\chi))
-        \end{align*}
-        and
-        \begin{align*}
-            \RI(\psi \Since{[a,b)} \chi)
-            &= (-b,0] \Cup ((-b,0] \oplus \RI(\psi)) \Cup ((-b,-a] \oplus \RI(\chi)).
-        \end{align*}
-        From $0 \in \RI(\psi \Since{[a,b)} \chi)$ and Condition 1 in Definition \ref{def:overlapping-ext} it follows that $\tau_i = \tau'_i-c$.
-
-        First we establish the two following claims.
-        \begin{enumerate}
-            \item
-                For all $j \in \mathbb{N}$ with $j \leq i$ and $\tau_i - \tau_j \in [a,b)$, it holds that 
-                \begin{align*}
-                    \RI(\chi) 
-                    &\subseteq \{ \tau_i - \tau_j \} \oplus \{ \tau_j - \tau_i\} \oplus \RI(\chi) \\
-                    &\subseteq \{\tau_i - \tau_j \} \oplus (-b, -a] \oplus \RI(\chi) \\
-                    &\subseteq \{ \tau_i - \tau_j \} \oplus \RI(\psi \Since{[a,b)} \chi)
-                \end{align*}
-                as well as
-                \begin{align*}
-                    \ERI(\chi) 
-                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \{ \tau_j - \tau_i\} \oplusext \ERI(\chi) \\
-                    &\subseteqmap \{\tau_i - \tau_j \} \oplusext (-b, -a] \oplusext \ERI(\chi) \\
-                    &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \ERI(\psi \Since{[a,b)} \chi)
-                \end{align*}
-                and $j \geq c$.
-                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\chi), \RI(\chi), c, j)$- overlapping.
-                It then follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$, for all valuations $v$.
-            \item
-                For all $k \in \mathbb{N}$ with $k \leq i$ and $\tau_i - \tau_k \in [0,b)$, it holds that
-                \begin{align*}
-                    \RI(\psi)
-                    &\subseteq \{ \tau_i - \tau_k \} \oplus \{ \tau_k - \tau_i \} \oplus \RI(\psi) \\
-                    &\subseteq \{ \tau_i - \tau_k \} \oplus (-b,0] \oplus \RI(\psi) \\
-                    &\subseteq \{ \tau_i - \tau_k \} \oplus \RI(\psi \Since{[a,b)} \chi) \\
-                \end{align*}
-                as well as
-                \begin{align*}
-                    \ERI(\psi)
-                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \{ \tau_k - \tau_i \} \oplusext \ERI(\psi) \\
-                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext (-b,0] \oplusext \ERI(\psi) \\
-                    &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \ERI(\psi \Since{[a,b)} \chi) \\
-                \end{align*}
-                and $k \geq c$
-                By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, k)$- overlapping.
-                It follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \psi$ for all valuations $v$.
-        \end{enumerate}
+\input{chapters/algorithms/eri-lemmas/eri-overlap.tex}
 
 
-    \item
-        $\psi \Until{[a,b)} \chi$.
-\end{itemize}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% \begin{lemma}
-%     \label{lem:ri-completness}
-%     Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
-%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i) \models \phi$.
-% \end{lemma}
-
-% A proof by structural induction on the structure of MFOTL formulas for Lemma A.4 \cite{Basin2016} / Lemma \ref{lem:ri-completness} is provided in Basin et al. \cite{Basin2016}.
-% We will extend this proof to also include the MFODL formulas as we defined them in Defintion \ref{def:mfodl-formula}.
-
-% For this we need an analogous lemma that works for regular expressions.
-
-% \begin{lemma}
-%     \label{lem:ri-completness-reg}
-%     Let $\rho$ be a regular expression and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
-%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RIr(\rho),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \rho$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c,j-c) \modelsreg \rho$.
-% \end{lemma}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% regular interval lemmata
-% We also need Definition A.4 from Basin et al. \cite{Basin2016}.
-% \begin{definition}
-%     \label{def:overlapping}
-%     Let $I \subseteq \mathbb{Z}$ be an interval and $c,i \in \mathbb{N}$.
-%     The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(I,c,i)$-overlapping if the following conditions hold:
-%     \renewcommand{\labelenumi}{\arabic{enumi}.}
-%     \begin{enumerate}
-%         \item $j \geq c, \mathcal{D}_j = \mathcal{D}'_{j-c},$ and $\tau_j = \tau'_{j-c},$ for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$.
-%         \item $\mathcal{D}_{j'+c} = \mathcal{D}'_j,$ and $\tau_{j'+c} = \tau'_{j'},$ for all $j' \in \mathbb{N}$ with $\tau'_{j'}-\tau_i \in I$.
-%     \end{enumerate}
-% \end{definition}
-% And finally Lemma A.4 itself.
-% \begin{lemma}
-%     \label{lem:ri-completness}
-%     Let $\phi$ be a formula and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
-%     If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\RI(\phi),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i) \models \phi$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i) \models \phi$.
-% \end{lemma}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Justification/ intuition for also getting all time points inside the entire regular interval
-% To get a correct sub trace $\sigma'$ we cannot simply extract the sub trace per predicate and mask.
-% There are possibly time points and time stamps in the original trace that have no predicate attached to them.
-% Therefore we additionally need to extract all such time stamps that fall into the regular relative interval of the formula.
-% Empty time points or time stamps can influence the truth value of a formula and can therefore not be omitted.
+To get a correct sub trace $\sigma'$ we cannot simply extract the sub trace per predicate and mask.
+There are possibly time points and time stamps in the original trace that have no predicate attached to them.
+Therefore we additionally need to extract all such time stamps that fall into the regular relative interval of the formula.
+Empty time points or time stamps can influence the truth value of a formula and can therefore not be omitted.
 
-% The first case of atomic formulas that are not a predicate is trivial.
-% They do not depend on any events that may or may not be present in a log and can be evaluated as is.
-% Next a simple predicate only depends on the current time point with time stamp $0$.
-% For the unary and binary first order logic formulas (negation, quantification, and, or) the extended relative interval is the special union of relative intervals of the sub formula(s).
-% Special union referring to the operator that keeps the intervals as intervals.
+The first case of atomic formulas that are not a predicate is trivial.
+They do not depend on any events that may or may not be present in a log and can be evaluated as is.
+Next a simple predicate only depends on the current time point with time stamp $0$.
+For the unary and binary first order logic formulas (negation, quantification, and, or) the extended relative interval is the special union of relative intervals of the sub formula(s).
+Special union referring to the operator that keeps the intervals as intervals.
