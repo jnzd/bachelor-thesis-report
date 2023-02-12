@@ -129,10 +129,7 @@ We have the following cases.
         Like with Lemma A.4 \cite{Basin2016} it is simpler than "previous", because no special distinctions have to be made for $i=0$ and $i-c=0$.
     \item
         $\psi \Since{[a,b)} \chi$.
-
-        % TODO
-        \textit{Needs to be finished and should probably be rewritten to not be a word for word copy of the original paper!!!}
-
+        Like the other cases this one is also very similar to the same case in the proof to Lemma A.4 \cite{Basin2016} and we follow the same structure.
         $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\psi \Since{[a,b)} \chi), \RI(\psi \Since{[a,b)} \chi), v, i)$- overlapping, where
         \begin{align*}
             \ERI(\psi \Since{[a,b)} \chi)
@@ -145,9 +142,9 @@ We have the following cases.
         \end{align*}
         From $0 \in \RI(\psi \Since{[a,b)} \chi)$ and Condition 1 in Definition \ref{def:overlapping-ext} it follows that $\tau_i = \tau'_i-c$.
 
-        First we establish the two following claims.
+        First we establish the two following claims, by applying the inductive hypothesis to the two sub-formulas $\psi$ and $\chi$.
         \begin{enumerate}
-            \item
+            \item ($\chi$)
                 For all $j \in \mathbb{N}$ with $j \leq i$ and $\tau_i - \tau_j \in [a,b)$, it holds that 
                 \begin{align*}
                     \RI(\chi) 
@@ -163,9 +160,16 @@ We have the following cases.
                     &\subseteqmap \{ \tau_i - \tau_j \} \oplusext \ERI(\psi \Since{[a,b)} \chi)
                 \end{align*}
                 and $j \geq c$.
+                We can convince ourselves that the second step in this equation holds, by considering how the $\oplusext$ operator shifts and or resizes the relative intervals inside a masked predicate map.
                 By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\chi), \RI(\chi), c, j)$- overlapping.
-                It then follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$, for all valuations $v$.
-            \item
+                It then follows from the inductive hypothesis that
+                \begin{equation*}
+                    (\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi
+                    \text{ iff }
+                    (\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi,
+                \end{equation*}
+                for all valuations $v$.
+            \item ($\psi$)
                 For all $k \in \mathbb{N}$ with $k \leq i$ and $\tau_i - \tau_k \in [0,b)$, it holds that
                 \begin{align*}
                     \RI(\psi)
@@ -180,9 +184,16 @@ We have the following cases.
                     &\subseteqmap \{ \tau_i - \tau_k \} \oplusext (-b,0] \oplusext \ERI(\psi) \\
                     &\subseteqmap \{ \tau_i - \tau_k \} \oplusext \ERI(\psi \Since{[a,b)} \chi) \\
                 \end{align*}
-                and $k \geq c$
+                and $k \geq c$.
                 By Lemma \ref{lem:eri-overlap-transitivity} $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERI(\psi), \RI(\psi), c, k)$- overlapping.
-                It follows from the inductive hypothesis that $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \psi$ for all valuations $v$.
+                It follows from the inductive hypothesis that
+                \begin{equation*}
+                    (\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi
+                    \text{ iff }
+                    (\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \psi,
+                \end{equation*}
+                for all valuations $v$.
+                
         \end{enumerate}
         We show each direction of the claimed equivalence, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$, for all valuations $v$, separately and start with the direction from left to right.
         If $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$ then there is some $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ such that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \psi$, for all $k \in [j+1, i+1)$.
@@ -196,6 +207,29 @@ We have the following cases.
         With $(\bar{\mathcal{D}}, \bar{\tau}, v, k' + c) \models \psi$ and Claim (ii) we get $(\bar{\mathcal{D}}', \bar{\tau}', v, k') \models \psi$.
         And with that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$.
         This concludes the proof in the first direction.
+
+        Next we show the other direction of the equivalence, i.e. if $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$ then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$.
+        This is equivalent to $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \psi \Since{[a,b)} \chi$ then $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \psi \Since{[a,b)} \chi$.
+        Like in the proof to Lemma A.4 \cite{Basin2016}, we show the second implication.
+        From Definition \ref{def:mfotl-evaluation} it follows that there are two possibilities for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) not\models \psi \Since{[a,b)} \chi$.
+        The first is that for no $j \leq i$, $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \chi$.
+        Or written differently, for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \chi$.
+        From the Definition \ref{def:rel-int} it follows that for all $j' \leq i-c$ with $\tau'_{i-c} - \tau'_{j'} = \tau_i - \tau'_{j'} \in [a,b)$, $\tau'_{j'} - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$.
+        This is a useful property, because it means we can conclude from Condition 2 of Definition \ref{def:overlapping-ext} that $\tau_{j'+c} = \tau'_{j'}$ for all $j' \leq i-c$.
+        And as in the proof to Lemma A.4 \cite{Basin2016} this means that there cannot be a time stamp within the interval $[a,b)$ in $(\bar{\mathcal{D}}', \bar{\tau}')$ that is not present in $(\bar{\mathcal{D}}, \bar{\tau})$.
+        We are currently looking at the case where for all $j \leq i$, $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \not\models \chi$.
+        Thus also $(\bar{\mathcal{D}}, \bar{\tau}, v, j'+c) \not\models \chi$ for all $j' \leq i-c$.
+        Combining this with Claim (i) from above we get that $(\bar{\mathcal{D}}', \bar{\tau}', v, j') \not\models \chi$.
+        And by Definition \ref{def:mfotl-evaluation} it follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \psi \Since{[a,b)} \chi$.
+
+        The second possibility for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) not\models \psi \Since{[a,b)} \chi$ is, that for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ there is some $k \in \mathbb{N}$ with $j < k \leq i$, $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$.
+        It follows from this that for every $j' \in \mathbb{N}$ with $j' \leq i-c$, $\tau'_{i-c} - \tau'_{j'} \in [a,b)$, and $(\bar{\mathcal{D}}', \bar{\tau}', v, j') \models \chi$, there exists a $j \in \mathbb{N}$ with $j = j' + c$.
+
+
+
+
+
+        
 
 
 

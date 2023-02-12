@@ -237,8 +237,8 @@ The support for SQL as a query language is of great use, because SQL is the most
 PostgreSQL is in itself a very popular dialect of SQL and thus has a lot of tooling available which can also be used with QuestDB.
 It further provides a REST API \cite{questdb-rest} and has a web console for both inserting and querying data.
 For best performance it supports the InfluxDB Line Protocol \cite{questdb-influx-db-line-protocol, influx-line} with client libraries for most popular modern programming languages.
-InfluxDB is itself a time series database and the line protocol is a write protocol developed by and for InfluxDB optimized for time series data.
-The QuestDB client liabries for different programming languages are implementations of the InfluxDB line protocol by QuestDB.
+InfluxDB is itself a time series database and the line protocol is a write-protocol developed by and for InfluxDB optimized for time series data.
+The QuestDB client libraries for different programming languages are implementations of the InfluxDB line protocol by QuestDB.
 QuestDB recommends using the Line Protocol for the best write performance, compared to the other methods of writing data.
 The Line Protocol cannot be used to query data.
 For that the PostgrSQL Wire Protocol is the recommended method.
@@ -263,14 +263,14 @@ We need two additional columns, one for the time point, i.e. an integer index, a
 One additional table keeping track of all time points and their time stamps is necessary, because a time point could occur without any event attached to it, if we only had the events stored, we would lose any record of such time points.
 And any time point can influence the evaluation of a formula.
 This time stamp and time point table technically makes it redundant to store the time stamps with every predicate, since the mapping from time point indices to time stamps is injective.
-But QuestDB requires a time stamp column and it is also beneficial for performance as QuestDB is optimized for queries on time ranges.
+But QuestDB requires a time stamp column, and it is also beneficial for performance as QuestDB is optimized for queries on time ranges.
 
 The database schema as SQL create statements for our example policy from Figure \ref{fig:example-policy} can be seen in Figure \ref{fig:example-policy-schema}.
 The \texttt{timestamp()} function is a special extension to SQL for QuestDB.
 It specifies the column that is used as the dedicated time stamp in a table.
 If it is not specified an additional time stamp column would get added.
 % The \texttt{PARTITION BY DAY} part tells QuestDB how to partition the tables.
-By default no partitioning would be used.
+By default, no partitioning would be used.
 
 \begin{figure}[H]
     \label{fig:example-policy-schema}
@@ -291,33 +291,10 @@ CREATE TABLE ts( time_stamp TIMESTAMP,
                  time_point INT) 
                  timestamp(time_stamp);
 \end{verbatim}
-% \begin{verbatim}
-% CREATE TABLE perm_revoked(x1 INT,
-%                           time_stamp TIMESTAMP,
-%                           time_point INT) 
-%                           timestamp(time_stamp)
-%                           PARTITION BY DAY;
-% CREATE TABLE perm_granted(x1 INT,
-%                           time_stamp TIMESTAMP,
-%                           time_point INT) 
-%                           timestamp(time_stamp) 
-%                           PARTITION BY DAY;
-% CREATE TABLE loc_accessed(x1 INT, x2 STRING,
-%                           time_stamp TIMESTAMP,
-%                           time_point INT) 
-%                           timestamp(time_stamp) 
-%                           PARTITION BY DAY;
-% CREATE TABLE ts( time_stamp TIMESTAMP,
-%                  time_point INT) 
-%                  timestamp(time_stamp) 
-%                  PARTITION BY DAY;
-% \end{verbatim}
     \caption{SQL Schema for Example Policy}
 \end{figure}
 
 
-% TODO describe addition of timestamp in rows
-% TODO describe form of queries
  
 
 

@@ -12,10 +12,8 @@
         for each $k \in \mathbb{N}$
         with $\tau_k - \tau_i \in I$, $K \subseteq \{ \tau_i - \tau_k \} \oplus I$,
         and $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$.
-    % TODO check that this lemma is complete
 \end{lemma}
 \textit{Proof} 
-% TODO write this proof
 This proof follows a similar structure as the proof of Lemma A.3 in Basin et al. \cite{Basin2016}.
 We first show that Condition 1 in Definition \ref{def:overlapping-ext} is satisfied, i.e.
 for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
@@ -36,35 +34,68 @@ And as we know that $(\bar{\mathcal{D}}, \bar{\tau})$
     it follows from Condition 1 in Definition \ref{def:overlapping-ext} that
     for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
     $j \geq c$, $\tau_j = \tau'_{j-c}$,
-    and $\filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i)$.
-We are done with Condition 1, if we can show that
-\begin{equation*}
-    \filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i),
-\end{equation*}
-for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$ implies 
-\begin{equation*}
-    \filter(N, \mathcal{D}_j, \tau_j, \tau_k) 
-    = \filter(N, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_k),  
-\end{equation*}
-for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
-The equality of two filtered structures can be shown that for all predicates $r$,
-$r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)} = r^{\filter(N, \mathcal{D}'_{j'}, \tau_{j'}, \tau_k)}$.
+    and $\filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i)$.
 
-By Definition \ref{def:filter} an interpretation $x$ is in $r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)}$ iff $\exists p,m,J . ((p,m), J) \in N \land p = r \land m \matches x \land \tau_i - \tau_k \in J$.
-From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any $p,m,J$, with $((p,m), J) \in N$ there must exist $p',m',J'$,
-    with $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$,
-    $p=p'$,
-    $m' \nomoreprecise m$,
-    and $J \subseteq J'$.
-From the definition of $\oplusext$ it is apparent that
-$((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$
-iff
-$((p',m'), \{\tau_k - \tau_i\} \oplus J') \in M$.
-Hence there is an interpretation in the filtration by $N$, if it is in the filtration with $M$ shifted by $\{\tau_i - \tau_k\}$.
-And from the fact that the two temporal structures are $(M,I,c,i)$- overlapping
+For any interpretation $x \in r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)}$, it follows that there exists a mask $m$ for $r$ that matches $x$ and has a relative interval $T_{rm}$ with $\tau_j - \tau_k \in T_{rm}$.
+Since $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$, there must exist a mask $m'$ for $r$ with $m' \nomoreprecise m$ and a relative interval $T_{rm'}$, for which $\tau_j - \tau_k \in \{ \tau_i - \tau_k \} \oplus T_{rm'}$.
+It follows that $\tau_k - \tau_i + \tau_j - \tau_k \in \{ \tau_k - \tau_i\} \oplus \{ \tau_i - \tau_k\} \oplus T_{rm'}$.
+And hence $\tau_j - \tau_i \in T_{rm'}$.
+From
+\begin{equation*}
+    \filter(M, \mathcal{D}_j, \tau_j, \tau_i)
+    = \filter(M, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_i),
+\end{equation*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$ and $T_{rm'} \subseteq I$, it follows that 
+$\tau'_{j-c} - \tau_i \in T_{rm'}$.
+
+\begin{align*}
+    \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}_j, \tau_j, \tau_k - \tau_i + \tau_i)
+    &= \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k - \tau_i + \tau_i), 
+\end{align*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
+We can convince ourselves that this holds, by looking at Definitions \ref{def:e-rel-int-ops} and \ref{def:filter}.
+First $\oplusext$ shifts all intervals in a map.
+Then $filter$ checks for any interpretation of a predicate if it has a matching mask in the masked predicate map and if a time stamp is in the relative interval of that mask.
+It is now easy to see that, if the original time stamp was in the original interval, the shifted time stamp is also in the shifted interval.
+And hence,
+\begin{align*}
+    \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}_j, \tau_j, \tau_k)
+    &= \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k) 
+\end{align*}
+for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
+We know that $N \subseteqmap \{\tau_k - \tau_i \} \oplusext M$ for $\tau_k - \tau_i \in I$.
+
+
+With this we are almost done.
+
+
+% We are done with Condition 1, if we can show that
+% \begin{equation*}
+%     \filter(M, \mathcal{D}_j, \tau_j, \tau_i) = \filter(M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i),
+% \end{equation*}
+% for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$ implies 
+% \begin{equation*}
+%     \filter(N, \mathcal{D}_j, \tau_j, \tau_k) 
+%     = \filter(N, \mathcal{D}'_{j-c}, \tau'_{j-c}, \tau_k),  
+% \end{equation*}
+% for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
+% % The equality of two filtered structures $\mathcal{D}_f$ and $\mathcal{D}'_f$ can be shown by showing that for all predicates $r$, $r^{\mathcal{D}_f} = r^{\mathcal{D}'_f}$.
+
+% By Definition \ref{def:filter} an interpretation $x$ is in $r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)}$ iff $\exists p,m,J . ((p,m), J) \in N \land p = r \land m \matches x \land \tau_i - \tau_k \in J$.
+% From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any $p,m,J$, with $((p,m), J) \in N$ there must exist $p',m',J'$,
+%     with $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$,
+%     $p=p'$,
+%     $m' \nomoreprecise m$,
+%     and $J \subseteq J'$.
+% From the definition of $\oplusext$ it is apparent that
+% $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$
+% iff
+% $((p',m'), \{\tau_k - \tau_i\} \oplus J') \in M$.
+% Hence there is an interpretation in the filtration by $N$, if it is in the filtration with $M$ shifted by $\{\tau_i - \tau_k\}$.
+% And from the fact that the two temporal structures are $(M,I,c,i)$- overlapping
 
 %TODO
-\textit{Needs to be finished}
+% \textit{Needs to be finished}
 
 \dots
 

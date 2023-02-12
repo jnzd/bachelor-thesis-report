@@ -29,6 +29,9 @@
 \usepackage{cases}
 \usepackage{float}
 \usepackage{mathtools}
+% \usepackage{algorithm}
+% \usepackage{algpseudocode}
+
 \usepackage{tikz}
 \usetikzlibrary{arrows}
 \usetikzlibrary{shapes,arrows}
@@ -36,9 +39,9 @@
 \usetikzlibrary{shapes.geometric, arrows}
 \addbibresource{bibliography/references.bib}
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{definition}{Definition}
-\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{lemma}{Lemma}[chapter]
 
 
 \title{A Real-Time, Flexible Logging and Monitoring Infrastructure for MonPoly}
@@ -46,6 +49,7 @@
 \date{February 2023}
 
 \begin{document}
+
 \input{operators.tex}
 
 \input{title-page.tex}

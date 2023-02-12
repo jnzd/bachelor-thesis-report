@@ -35,6 +35,38 @@ For every predicate and its potential occurrences with different constant values
 We use this information to create a SQL query that only queries the constant values combined with the interval.
 This way we minimize the amount of data that the new monitor has to read and process.
 
+\section{Performance Overhead}
+
+\section{Flask}
 
 \section{Partial Policy Change}
+
+We have started looking into a different method for a policy change that could be done directly through MonPoly and would not rely on the wrapper and the presence of a database.
+The general idea is that in many use cases it is common that a policy is made up of many individual parts and one might want to change only a small part of a formula.
+Consider for example a privacy policy on a website.
+Let's say a user has the ability to specify where their data may and may not be used.
+Maybe they had selected very restrictive options, but now want to allow their data to be used in one specific case.
+MonPoly has now continuously been monitoring the restrictive policy and also has the state for all the sub-formulas in the larger policy.
+In terms of efficiency it would be useful, if the state would only need to be recomputed for the one part that got changed and if the rest of the state could be kept.
+
+One case might be where policies are all in conjunctive normal form (CNF) and single conjuncts might get added or removed.
+To remove a conjunct from the formula it needs some sort of identifier.
+In a regular structure like a CNF formula this could be done by automatic indexing.
+But it still poses some questions, like what happens if the monitor rewrites the formula to an equivalent one, but changes the order.
+Then the user doesn't have an inherent idea of a conjuncts' location anymore.
+Our solution to this problem was thus to let the user provide identifiers in the form of strings for certain sub-formulas.
+
+We have begun implementing this change in MonPoly.
+Our idea makes use of the existing commands feature that lets a user control certain aspects of MonPoly during its runtime.
+We envision commands of the form "remove sub-formula x", "add formula y as a conjunct to sub-formula x".
+The second example would replace place the sub formula "x and y" in place of "x".
+An analogous thing for "or" with an "add disjunct" command is also perceivable.
+Or also a command like "negate sub-formula x".
+
+With all this, MonPoly would parse the new formula part, add it to the existing formula, check if the new formula is monitorable, and if so it updates the policy.
+Similarly if a part gets removed a check on monitorability of the remaining formula needs to be done.
+Before adding a sub-formula, the existing trace has to be checked against that sub-formula and this state must get combined with the pre-existing state of MonPoly.
+
+We have started implementing a feature that allows for named formulas inside MonPoly.
+The names should have no effect on the monitoring and solely act as the identifiers of formula parts.
 

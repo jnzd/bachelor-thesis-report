@@ -14,6 +14,16 @@ Next the wrapper stops the current iteration of MonPoly and starts a new one tha
 At this point the policy change is done, and the wrapper can continue with its normal operation.
 
 % \textit{TODO write some pseudo code here}
+% \begin{algorithmic}[1]
+% \State $i $
+% \If{$i\geq 5$} 
+%     \State $i \gets i-1$
+% \Else
+%     \If{$i\leq 3$}
+%         \State $i \gets i+2$
+%     \EndIf
+% \EndIf 
+% \end{algorithmic}
 
 
 \input{chapters/algorithms/ri.tex}
@@ -29,7 +39,7 @@ If the constant values in a mask $m_i = (m_{i1}, \dots, m_{i{\iota(p)}})$
 have the indices $j_1, \dots, j_l$, with 
 $l \leq \iota(p)$
 and the relative interval is $[a,b)$, then the corresponding SQL clause is \texttt{WHERE (x<$j_1$> = $m_{ij_1}$ AND ... AND x<$j_l$> AND ts >= $a$ AND ts < $b$)}.
-Depending on wheter an interval bound is open or closed, the corresponding comparison operators are used.
+Depending on whether an interval bound is open or closed, the corresponding comparison operators are used.
 If an interval is unbounded, then that bound is omitted and all events are retrieved.
 When multiple masks and intervals for a predicate exist, multiple of the described conditions are concatenated with \texttt{AND}.
 This approach adds potentially overlapping conditions.
@@ -51,7 +61,7 @@ FROM ts           SELECT * WHERE (time_stamp <= $\tau_i - 0$)
     \caption{Extended Relative Intervals of Example Policy}
 \end{figure}
 
-The time stamp is converted to a unix style time stamp string that can be understood by QuestDB \cite{questdb-time-stamps}
+The time stamp is converted to a Unix style time stamp string that can be understood by QuestDB \cite{questdb-time-stamps}
 
 
 
