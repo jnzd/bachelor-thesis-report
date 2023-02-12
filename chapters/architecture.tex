@@ -41,22 +41,24 @@ In this section we provide a list of all the REST API endpoints, describe their 
 
 \input{chapters/architecture/rest-api.tex}
 
-The following endpoints are set and get methods for the various configuration options for the QuestDB connection.
-They either take a single string or integer argument and are fairly self-explanatory.
-\begin{itemize}
-    \item \texttt{/db-set-user}
-    \item \texttt{/db-set-password}
-    \item \texttt{/db-set-host}
-    \item \texttt{/db-set-pgsql-port}
-    \item \texttt{/db-set-influxdb-port}
-    \item \texttt{/db-set-database}
-    \item \texttt{/db-get-user}
-    \item \texttt{/db-get-password}
-    \item \texttt{/db-get-host}
-    \item \texttt{/db-get-pgsql-port}
-    \item \texttt{/db-get-influxdb-port}
-    \item \texttt{/db-get-database}
-\end{itemize}
+The wrapper also provides various "getter"- and "setter"- methods for the configuration details of QuestDB.
+They do not change the configuration of QuestDB itself, but simply tell the wrapper how to reach QuestDB.
+These should be fairly self-explanatory.
+We will quickly list them here for completeness. 
+For more information on what each of these values does, the QuestDB documentation \cite{questdb,questdb-postgres-wire,questdb-influx-db-line-protocol} can be consulted.
+The QuestDB related endpoints are:
+\texttt{/db-set-user}, \\
+\texttt{/db-set-password}, \\
+\texttt{/db-set-host}, \\
+\texttt{/db-set-pgsql-port}, \\
+\texttt{/db-set-influxdb-port}, \\
+\texttt{/db-set-database}, \\
+\texttt{/db-get-user}, \\
+\texttt{/db-get-password}, \\
+\texttt{/db-get-host}, \\
+\texttt{/db-get-pgsql-port},\\
+\texttt{/db-get-influxdb-port}, and \\
+\texttt{/db-get-database}.
 
 
 
