@@ -1,14 +1,12 @@
 # Bachelor Thesis Report
 
 ## TODO
-- [ ] Introduction
-<!-- - [ ] Background -->
-- [ ] Architecture
+- [x] Introduction
+- [x] Background
+- [x] Architecture
 - [ ] Algorithms
-- [ ] Implementation
-- [ ] Evaluation
+- [ ] Implementation and Evaluation
 - [ ] Conclusion
-- [ ] possibly merge the implementation and evaluation chapters
 
 
 ---
