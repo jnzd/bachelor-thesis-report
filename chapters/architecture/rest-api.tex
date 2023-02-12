@@ -1,0 +1,60 @@
+\begin{itemize}
+    \item \texttt{/}
+    This endpoint is designed to be viewed in the browser, and it displays basic information about the state of the wrapper.
+    It shows the current policy and signature, if they have been set.
+    Perhaps most importantly it displays the output from MonPoly.
+
+    \item \texttt{/set-policy}
+    This takes any policy or formula file for MonPoly.
+    With this command the policy is only stored by the wrapper.
+    Any checks are only done when attempting to start the monitor itself.
+    \begin{verbatim}
+$ curl -X POST -F policy=@<path/to/policy>
+                <wrapper-hostname>[:port]/set-policy
+> {"message":"policy set to  <contents of policy file>"}
+    \end{verbatim}
+
+    \item \texttt{/change-policy}
+
+    This command can only be issued when the monitor is already running.
+    It will only succeed if the new policy provided is monitorable with the signature that was initially provided.
+    There is no way to update the signature once the monitoring has begun.
+    \begin{verbatim}
+       $ curl <wrapper-hostname>/change-policy -f <path/to/policy>
+    \end{verbatim}
+    \item \texttt{/get-policy}
+    This returns the policy as a JSON object, as seen below.
+    \begin{verbatim}
+$ curl -X GET <wrapper-hostname>[:port]/get-policy
+
+{"policy":"<contents of policy file>"}
+    \end{verbatim}
+
+    \item \texttt{/set-signature}
+    \begin{verbatim}
+$ curl -X POST -F signature=@<path/to/signature> \
+                <wrapper-hostname>[:port]/set-signature
+
+{"message":"signature set to <contents of signature file>"}
+    \end{verbatim}
+
+    \item \texttt{/get-signature}
+    \begin{verbatim}
+$ curl -X GET <wrapper-hostname>[:port]/get-signature
+
+{"signature":"<contents of signature file>"}
+    \end{verbatim}
+    \item \texttt{/start-monitor}
+    \begin{verbatim}
+$ curl -X GET localhost:5000/start-monitor      
+{
+    "pid": <process id of MonPoly>,
+    "args": [ <command line arguments passed to MonPoly> ]
+}
+    \end{verbatim}
+    \item \texttt{/stop-monitor}
+    \item \texttt{/reset-everything}
+    \item \texttt{/get-events}
+    \item \texttt{/get-most-recent}
+
+\end{itemize}

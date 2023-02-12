@@ -2,6 +2,14 @@
 
 \section{Wrapping MonPoly}
 
+
+
+The wrapper runs MonPoly as a subprocess and handles all interactions with MonPoly itself.
+Incoming events are first parsed and checked on some major formatting errors.
+When the formatting is deemed acceptable the events get forwarded to MonPoly on a per time point basis.
+If MonPoly reports an issue with a certain time stamp, either it is out of order or one event at that timestamp does not comply with the given signature, this time stamp gets ignored by MonPoly, and in turn the wrapper discards it as well.
+If no issue is detected with a timestamp all events in at that timestamp get forwarded to the database.
+
 \subsection{Performance}
 
 
@@ -28,4 +36,5 @@ We use this information to create a SQL query that only queries the constant val
 This way we minimize the amount of data that the new monitor has to read and process.
 
 
-\section{Partial Policy Updates}
+\section{Partial Policy Change}
+

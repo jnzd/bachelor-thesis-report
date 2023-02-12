@@ -2,15 +2,15 @@
     \label{lem:eri-overlap-transitivity}
     Let $(\bar{\mathcal{D}}, \bar{\tau})$
         and
-        $(\bar{\mathcal{D}}', \bar{\tau}')$ be two temporal structures that are $(M,T,c,i)$-overlapping,
+        $(\bar{\mathcal{D}}', \bar{\tau}')$ be two temporal structures that are $(M,I,c,i)$-overlapping,
             for some masked predicate map $M$,
-            $T \subseteq \mathbb{Z}$,
+            $I \subseteq \mathbb{Z}$,
             $c \in \mathbb{N}$,
             and $i \in \mathbb{Z}$.
     Then $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$
     are $(N, K, c, k)$-overlapping,
         for each $k \in \mathbb{N}$
-        with $\tau_k - \tau_i \in T$, $K \subseteq \{ \tau_i - \tau_k \} \oplus T$,
+        with $\tau_k - \tau_i \in I$, $K \subseteq \{ \tau_i - \tau_k \} \oplus I$,
         and $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$.
     % TODO check that this lemma is complete
 \end{lemma}
@@ -32,7 +32,7 @@ From $K \subseteq \{ \tau_i - \tau_k \} \oplus I$,
     we get $\{\tau_k - \tau_i\} \oplus K \subseteq \{\tau_k - \tau_i \} \oplus \{\tau_i - \tau_k \} \oplus I = I$,
     or in short $\tau_j - \tau_i \in I$.
 And as we know that $(\bar{\mathcal{D}}, \bar{\tau})$
-    and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,T,c,i)$-overlapping,
+    and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$-overlapping,
     it follows from Condition 1 in Definition \ref{def:overlapping-ext} that
     for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$,
     $j \geq c$, $\tau_j = \tau'_{j-c}$,
@@ -49,8 +49,9 @@ for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$ implies
 for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
 The equality of two filtered structures can be shown that for all predicates $r$,
 $r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)} = r^{\filter(N, \mathcal{D}'_{j'}, \tau_{j'}, \tau_k)}$.
+
 By Definition \ref{def:filter} an interpretation $x$ is in $r^{\filter(N, \mathcal{D}_j, \tau_j, \tau_k)}$ iff $\exists p,m,J . ((p,m), J) \in N \land p = r \land m \matches x \land \tau_i - \tau_k \in J$.
-From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any $p,m,J$, with $((p,m), J) \in K$ there exist $p',m',J'$,
+From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any $p,m,J$, with $((p,m), J) \in N$ there must exist $p',m',J'$,
     with $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$,
     $p=p'$,
     $m' \nomoreprecise m$,
@@ -58,9 +59,13 @@ From $N \subseteqmap \{ \tau_i - \tau_k \} \oplusext M$ it follows that for any 
 From the definition of $\oplusext$ it is apparent that
 $((p',m'), J') \in \{\tau_i - \tau_k \} \oplusext M$
 iff
-$((p',m'), \{\tau_k - \tau_i\} \oplus J') \in M$ 
+$((p',m'), \{\tau_k - \tau_i\} \oplus J') \in M$.
+Hence there is an interpretation in the filtration by $N$, if it is in the filtration with $M$ shifted by $\{\tau_i - \tau_k\}$.
+And from the fact that the two temporal structures are $(M,I,c,i)$- overlapping
 
-$\tau_i - \tau_k \in J$ if $\tau_i - \tau_k \in $
-
+%TODO
+\textit{Needs to be finished}
 
 \dots
+
+

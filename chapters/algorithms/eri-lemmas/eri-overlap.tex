@@ -129,6 +129,10 @@ We have the following cases.
         Like with Lemma A.4 \cite{Basin2016} it is simpler than "previous", because no special distinctions have to be made for $i=0$ and $i-c=0$.
     \item
         $\psi \Since{[a,b)} \chi$.
+
+        % TODO
+        \textit{Needs to be finished and should probably be rewritten to not be a word for word copy of the original paper!!!}
+
         $(\bar{\mathcal{D}},\bar{\tau})$ and $(\bar{\mathcal{D}}',\bar{\tau}')$ are $(\ERI(\psi \Since{[a,b)} \chi), \RI(\psi \Since{[a,b)} \chi), v, i)$- overlapping, where
         \begin{align*}
             \ERI(\psi \Since{[a,b)} \chi)
@@ -188,8 +192,14 @@ We have the following cases.
 
         For all $k' \in [j+1-c, i+1-c)$, it holds that $\tau'_{k'} - \tau'_{i-c} = \tau'_{k'} - \tau_i \in (-b,0]$ and hence $\tau'_{k'} - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$.
         % TODO continue
-        From Condition 2 in Definition \ref{def:overlapping-ext} we see that $\tau_{k'+c} = \tau'_{k'}$.
-        From Claim (ii) above and from 
+        It follows from Condition 2 in Definition \ref{def:overlapping-ext} that $\tau_{k'+c} = \tau'_{k'}$.
+        With $(\bar{\mathcal{D}}, \bar{\tau}, v, k' + c) \models \psi$ and Claim (ii) we get $(\bar{\mathcal{D}}', \bar{\tau}', v, k') \models \psi$.
+        And with that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$.
+        This concludes the proof in the first direction.
+
+
+
+
         \dots
 
 

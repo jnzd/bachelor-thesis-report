@@ -5,14 +5,12 @@
     The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,i)$- overlapping, for all $i \in \mathbb{N}$ with $\tau_i \in T$, where $c \in \mathbb{N}$ is the value in Definition \ref{def:overlapping-ext} used by the function $s$ with respect to $(\bar{\mathcal{D}}, \bar{\tau})$ and its slice $(\bar{\mathcal{D}}', \bar{\tau}')$.
 \end{lemma}
 \textit{Proof}
-% TODO change proof to correspond to updated lemma
 This proof follows the same structure as the proof to Lemma A.2 in Basin et al. \cite{Basin2016} and the first few steps are the same.
 The precondition in Definition \ref{def:overlapping-ext}, that every interval in $M$ is contained in the interval $T$, is satisfied, as it is also a precondition for Lemma \ref{lem:mt-slice-overlap}.
 First we show condition 1 in Definition \ref{def:overlapping-ext}.
 For all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in T$, it follows from $\tau_i \in I$ that $\tau_j \in T \oplus I$.
 From $c = \min\{k \in \mathbb{N} \mid \tau_k \in T \}$ we get $j \geq c$.
 Even more precisely  for all $j \in \mathbb{N}$ with $\tau_j \in T \oplus I$, we get that $j \in [c, l+c)$.
-% As a direct consequence we get $j \geq c$.
 From Definition \ref{def:mt-slice} it follows that
 \begin{align*}
     \mathcal{D}'_{j-c}
