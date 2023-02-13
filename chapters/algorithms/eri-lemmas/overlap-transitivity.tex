@@ -47,26 +47,39 @@ From
 \end{equation*}
 for all $j \in \mathbb{N}$ with $\tau_j - \tau_i \in I$ and $T_{rm'} \subseteq I$, it follows that 
 $\tau'_{j-c} - \tau_i \in T_{rm'}$.
-
+Moreover, we observe that for any $\delta$, we have 
+\begin{align*}
+    \filter(M, \mathcal{D}_j, \tau_j, \tau_i)
+    &= \filter(\{ \delta \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_i - \delta). 
+\end{align*}
+\iffalse
 \begin{align*}
     \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}_j, \tau_j, \tau_k - \tau_i + \tau_i)
-    &= \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k - \tau_i + \tau_i), 
+    &= \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k - \tau_i + \tau_i),
 \end{align*}
 for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
-We can convince ourselves that this holds, by looking at Definitions \ref{def:e-rel-int-ops} and \ref{def:filter}.
+\fi
+We can convince ourselves that this holds by looking at Definitions \ref{def:e-rel-int-ops} and \ref{def:filter}.
 First $\oplusext$ shifts all intervals in a map.
-Then $filter$ checks for any interpretation of a predicate if it has a matching mask in the masked predicate map and if a time stamp is in the relative interval of that mask.
+Then $\filter$ checks for any interpretation of a predicate if it has a matching mask in the masked predicate map and if a time stamp is in the relative interval of that mask.
 It is now easy to see that, if the original time stamp was in the original interval, the shifted time stamp is also in the shifted interval.
-And hence,
+And hence, by choosing $\delta = \tau_i - \tau_k$, we get
 \begin{align*}
-    \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}_j, \tau_j, \tau_k)
-    &= \filter(\{ \tau_k - \tau_i \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k) 
+    \filter(\{ \tau_i - \tau_k \} \oplusext M, \mathcal{D}_j, \tau_j, \tau_k)
+    &= \filter(\{ \tau_i - \tau_k \} \oplusext M, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k) 
 \end{align*}
 for all $j \in \mathbb{N}$ with $\tau_j - \tau_k \in K$.
-We know that $N \subseteqmap \{\tau_k - \tau_i \} \oplusext M$ for $\tau_k - \tau_i \in I$.
+Since $N \subseteqmap \{\tau_i - \tau_k \} \oplusext M$ with $\tau_i - \tau_k \in I$, 
+we get 
+\begin{align*}
+    \filter(N, \mathcal{D}_j, \tau_j, \tau_k)
+    &= \filter(N, \mathcal{D}'_{j'}, \tau'_{j'}, \tau_k).
+\end{align*}
+With this Condition 1 of Definition \ref{def:overlapping-ext} holds for $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ to be $(N,K,c,k)$- overlapping.
 
-
-With this we are almost done.
+To show that Condition 2 of Definition \ref{def:overlapping-ext} also holds, we can start by looking at all $j' \in \mathbb{N}$ with $\tau'_{j'} - \tau_k \in K$.
+From our work for the first part it follows that $\tau'_{j'} - \tau_i \in I$.
+Hence it follows from Condition 2 of Definition \ref{def:overlapping-ext} and $(\bar{\mathcal{D}}, \bar{\tau})$, the observation we used to show Condition 1, and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,k)$- overlapping, that they are also $(N,K,c,k)$- overlapping.
 
 
 % We are done with Condition 1, if we can show that
@@ -96,7 +109,5 @@ With this we are almost done.
 
 %TODO
 % \textit{Needs to be finished}
-
-\dots
 
 

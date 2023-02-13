@@ -101,7 +101,7 @@ $ curl -X GET <wrapper-hostname>[:port]/reset-everything
     We aimed for a high fault tolerance in this regard.
     If some time points in a log file get skipped, they have no effect on the processing of time points that were in order and correctly formatted.
     \begin{verbatim}
-$ curl -X POST -F events=@<paht/to/JSON/log/file> \
+$ curl -X POST -F events=@<path/to/JSON/log/file> \
                     <wrapper-hostname>[:port]/log-events        
 > {"skipped-timepoints":<dictionary of any skipped time points>}
     \end{verbatim}

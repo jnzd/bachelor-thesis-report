@@ -9,7 +9,7 @@ We focus on the core MFOTL formulas.
 
 \textit{Proof} This proof is in large parts analogous to the one to Lemma A.4 in Basin et al. \cite{Basin2016}, and we follow the same structure. First we note that for the same reason as in Lemma A.4 in Basin et al. \cite{Basin2016}, the lemma's statement is well-defined, as the definition of $\RI(\phi)$ did not change and still includes $0$.
 We proof the lemma by structural induction on the formula $\phi$.
-In this proof $S = (C, R, \iota)$ is a signature, with constants $C$, predicats $R$, and the arity function $\iota$.
+In this proof $S = (C, R, \iota)$ is a signature, with constants $C$, predicates $R$, and the arity function $\iota$.
 Similarly $V$ is the set of variables.
 We have the following cases.
 
@@ -211,7 +211,7 @@ We have the following cases.
         Next we show the other direction of the equivalence, i.e. if $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \psi \Since{[a,b)} \chi$ then $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \psi \Since{[a,b)} \chi$.
         This is equivalent to $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \psi \Since{[a,b)} \chi$ then $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \psi \Since{[a,b)} \chi$.
         Like in the proof to Lemma A.4 \cite{Basin2016}, we show the second implication.
-        From Definition \ref{def:mfotl-evaluation} it follows that there are two possibilities for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) not\models \psi \Since{[a,b)} \chi$.
+        From Definition \ref{def:mfotl-evaluation} it follows that there are two possibilities for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \psi \Since{[a,b)} \chi$.
         The first is that for no $j \leq i$, $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \chi$.
         Or written differently, for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$, $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \chi$.
         From the Definition \ref{def:rel-int} it follows that for all $j' \leq i-c$ with $\tau'_{i-c} - \tau'_{j'} = \tau_i - \tau'_{j'} \in [a,b)$, $\tau'_{j'} - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$.
@@ -222,23 +222,22 @@ We have the following cases.
         Combining this with Claim (i) from above we get that $(\bar{\mathcal{D}}', \bar{\tau}', v, j') \not\models \chi$.
         And by Definition \ref{def:mfotl-evaluation} it follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \not\models \psi \Since{[a,b)} \chi$.
 
-        The second possibility for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) not\models \psi \Since{[a,b)} \chi$ is, that for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ there is some $k \in \mathbb{N}$ with $j < k \leq i$, $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$.
+        The second possibility for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \not\models \psi \Since{[a,b)} \chi$ is, that for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ there is some $k \in \mathbb{N}$ with $j < k \leq i$, $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$.
         It follows from this that for every $j' \in \mathbb{N}$ with $j' \leq i-c$, $\tau'_{i-c} - \tau'_{j'} \in [a,b)$, and $(\bar{\mathcal{D}}', \bar{\tau}', v, j') \models \chi$, there exists a $j \in \mathbb{N}$ with $j = j' + c$.
         It follows from $\tau'_{i-c} - \tau'_{j'} \in [a,b)$ and $\tau'_{i-c} = \tau_i$, that $\tau'_{j'} - \tau_i \in (-b,-a]$ and further with the help of Definition \ref{def:rel-int} it follows that $\tau'_{j'} - \tau_i \in \RI(\psi \Since{[a,b)} \chi)$.
         From this we recall Condition 2 from Definition \ref{def:overlapping-ext} and see that $\tau_j = \tau'_{j-c} = \tau'{j'}$.
         Since $j' \leq i-c$ and $j = j'+c$ it follows that $j \leq i$.
         By having shown that $\tau'_{j'} = \tau_j$ and $j \leq i$, we can now make use of Claim (i) from above again and combine it with $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$.
         It follows that $(\bar{\mathcal{D}}', \bar{\tau}', v, j'+c) \models \chi$.
-        From $\tau'_{j'} = \tau_{j+c} = \tau_j$ it follows that $\tau_k = \tau'_{k-c}$
-        Going back around we now have that there is a $k \in \mathbb{N}$ with $ j' < k-c \leq i-c$, for which $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \not\models \chi$.
+        From $\tau'_{j'} = \tau_{j+c} = \tau_j$ it follows that $\tau_k = \tau'_{k-c}$.
         
-
-
-
-        %TODO
-
-        \dots
-
+        We can use Claim (i) for $j$, because $\tau'_{j'} = \tau_j$ and $j \leq i$.
+        Combining Claim (i) with $(\bar{\mathcal{D}}', \bar{\tau}', v, j-c) \models \chi$ yields that $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$.
+        And for this we have already established that there must exist a $k \in \mathbb{N}$ with $j < k \leq i$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$.
+        It follows from $\tau'_{i-c} - \tau'_{j'} \in [a,b)$ that $\tau_i - \tau_j \in [a,b)$.
+        And with $j < k \leq i$ it follows that $\tau_i - \tau_k \in [0,b)$.
+        This means Claim (ii) from above is applicable to $k$ and with it, it follows from $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$ that $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \not\models \psi$.
+        And thus $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \not\models \psi \Since{[a,b)} \chi$.
 
     \item
         $\psi \Until{[a,b)} \chi$.
