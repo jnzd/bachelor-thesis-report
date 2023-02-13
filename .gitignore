@@ -1,5 +1,6 @@
 *.code-workspace
 .vscode/*
+eigenständigkeitserklärung.pdf
 
 ## latex gitignore from: https://github.com/github/gitignore/blob/main/TeX.gitignore
 
