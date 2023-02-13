@@ -1,1 +1,22 @@
 \chapter{Conclusion}
+
+To recap, we have set out to build a wrapper around MonPoly that handles persistent data storage, offers a web friendly interface to MonPoly, and provides a policy change method.
+MonPoly is a runtime monitoring tool that uses MFOTL (and in its newest version also MFODL) as a policy specification language.
+MFOTL and MFODL are powerful, as in they can express a large amount of properties.
+
+The amount of computer systems in the world is only growing and with it the need for security guarantees is also increasing.
+While MonPoly does not directly offer such guarantees, it is a useful tool in detecting policy violations.
+
+Considering that a runtime monitor and a database storing system activities often rely on the same data, the idea to combine storing events and monitoring them is a natural one.
+Some regulation, like GDPR, also requires logging of certain information.
+This combination of technologies also offers new possibilities, that were not easily achievable before.
+One such thing is a policy change.
+When past data can simply be read from the database, it becomes easy to restore the same state when starting to monitor a new policy.
+
+There are many points of future interest around the wrapper specifically and more generally about policy change.
+As far as the wrapper is concerned, we have already briefly mentioned that one natural expansion would be to monitor multiple policies at the same time.
+The wrapper would be well suited to abstract away the intricacies and provide a simple interface to the user.
+
+An obvious area for future work is our partial policy change, the core idea of which is outlined at the end of chapter 3.
+Such an approach may be sufficient to achieve ideal performance.
+Data protection, where a user can add or remove certain permissions, can be one such use case.

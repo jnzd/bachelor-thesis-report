@@ -54,18 +54,18 @@ It consists of the domain $| \mathcal{D} | \neq \emptyset$ and interpretations $
 Basin et al. \cite{Basin2015} further defines a temporal structure as a pair $(\bar{\mathcal{D}}, \bar{\tau})$ whith $\bar{\mathcal{D}} = (\mathcal{D}_0, \mathcal{D}_1, \dots)$ is a sequence of structures over $S$ and $\bar{\tau} = (\tau_0, \tau_1, \dots)$ is a sequence of non-negative integers (\textit{time stamps}) with the following 3 properties.
 \renewcommand{\labelenumi}{\arabic{enumi}.}
 \begin{enumerate}
-    \item The sequence is monotonically increasing, i.e. $\forall i . \tau_i \leq \tau_{i+1}$. Moreover $\bar{\tau}$ makes progress for every $\tau \in \mathbb{N}$ there is some $i$ such that $\tau < \tau_i$. 
+    \item The sequence is monotonically increasing, i.e. $\forall i . \tau_i \leq \tau_{i+1}$. Moreover, $\bar{\tau}$ makes progress for every $\tau \in \mathbb{N}$ there is some $i$ such that $\tau < \tau_i$. 
     \item $\bar{\mathcal{D}}$ has constant domains, that is, for all $i \geq 0$, $|\mathcal{D}_i| = |\mathcal{D}_{i+1}|$.
     \item Each constant symbol $c \in C$ has a rigid interpretation, that is, for all $i \geq 0$, $c^{\mathcal{D}_i} = c^{\mathcal{D}_{i+1}}$.
 \end{enumerate}
 A temporal structure is sometimes called a trace and denoted $\sigma$.
 It is important to note the difference between \textit{time stamps} and \textit{time points}.
-Time points are the combination of a time stamp $\tau_i$ and a structur $\mathcal{D}_i$, where $i$ is the index by which a time point is described.
+Time points are the combination of a time stamp $\tau_i$ and a structure $\mathcal{D}_i$, where $i$ is the index by which a time point is described.
 Since the domain of the structures $\mathcal{D}_i$ and the valuation of constants $c \in C$ do not change they are denoted as $|\bar{\mathcal{D}}|$ and $c^{\bar{\mathcal{D}}}$ respectively.
 Basin et al. defines a \textit{valuation} as a mapping $v : V \to |\bar{\mathcal{D}}|$.
 And for a variable vector $\bar{x} = (x_1,\dots,x_n)$, and $\bar{d}=(d_1,\dots,d_n) \in |\bar{\mathcal{D}}$ it defines the notation $v[\bar{x} \mapsto \bar{d}]$ for the valuation that maps $x_i$ to $d_i$ for $1 \leq i \leq n$.
 Further it uses a notational hack to also apply a valuation $v$ to constant symbols $c \in C$ where $v(c) = c^{\bar{\mathcal{D}}}$.
-For convenience we restate Definition 2.2 from Basin et al. \cite{Basin2015}.
+For convenience, we restate Definition 2.2 from Basin et al. \cite{Basin2015}.
 Since we changed the definition of a formula to include ordering relations ($\prec, \preceq$) instead of only equality ($\approx$), we append this definition to allow for that.
 These additions are also in Figure 1 of Basin et. al \cite{Basin2020}.
 
@@ -104,7 +104,7 @@ These additions are also in Figure 1 of Basin et. al \cite{Basin2020}.
     \end{alignat*}
 \end{definition}
 
-Anologous to Definition \ref{def:mfotl-evaluation} we now give the definition of an MFODL formula.
+Analogous to Definition \ref{def:mfotl-evaluation} we now give the definition of an MFODL formula.
 The definition is based on Figure 4 of Basin et al. \cite{Basin2020}, but in a notation closer to the one we already used for MFOTL formulas.
 For MFODL formulas we first have to define regular expressions, as MFODL formulas depend on them.
 \renewcommand{\labelenumi}{(\roman{enumi})}
@@ -241,14 +241,14 @@ InfluxDB is itself a time series database and the line protocol is a write-proto
 The QuestDB client libraries for different programming languages are implementations of the InfluxDB line protocol by QuestDB.
 QuestDB recommends using the Line Protocol for the best write performance, compared to the other methods of writing data.
 The Line Protocol cannot be used to query data.
-For that the PostgrSQL Wire Protocol is the recommended method.
+For that the PostgreSQL Wire Protocol is the recommended method.
 QuestDB is written in Java, open source, and licensed under the Apache 2.0 license.
 
 \subsection{Time Series Databases for Runtime Monitoring}
-In this section we explore how a timeseries database can be utilized in the context of runtime monitoring.
+In this section we explore how a time series database can be utilized in the context of runtime monitoring.
 We will contrast policies and database queries, as well as signatures and database schemas.
-An important and possibly counter intuitive thing is that MFOTL is not any more expressive than FOL.
-In fact they have the same expression strength, i.e. any MFOTL formula can be expressed as a FOL formula and vice versa.
+An important and possibly counterintuitive thing is that MFOTL is not any more expressive than FOL.
+In fact, they have the same expression strength, i.e. any MFOTL formula can be expressed as a FOL formula and vice versa.
 Any FOL formula is by definition also a MFOTL formula.
 The other way around any trace in MFOTL can be simulated in FOL by extending predicates with two attributes for the time point and time stamp.
 Take for example the formula $\phi = \Previous{[a,b)} P()$ where $P$ is a predicate with arity $0$.

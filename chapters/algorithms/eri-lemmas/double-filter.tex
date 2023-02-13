@@ -13,8 +13,8 @@ for all $r \in R$,
 \begin{equation*}
     r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} 
     = \{v(\bar{t}) \in r^{\mathcal{D}} \mid 
-        \exists ((p,m), I) \in M. 
-            p = r 
+        \exists m,I.
+            ((r,m), I) \in M
             \land m \matches v(\bar{t}) 
             \land \tau_i - \tau_j \in I \}.
 \end{equation*}
@@ -22,8 +22,8 @@ And also for all $r \in R$,
 \begin{align*}
     &r^{\filter(M, \filter(M, \mathcal{D}, \tau_i, \tau_j), \tau_i, \tau_j)} \\
     &= \{v(\bar{t}) \in r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} \mid 
-        \exists ((p,m), I) \in M. 
-            p = r 
+        \exists m,I.
+            ((r,m), I) \in M. 
             \land m \matches v(\bar{t}) 
             \land \tau_i - \tau_j \in I \}.
 \end{align*}

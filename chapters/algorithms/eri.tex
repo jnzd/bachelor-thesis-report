@@ -183,13 +183,13 @@ We first need a few definitions and lemmas before we can proof this property.
     Let $M$ be a masked predicate map, $\tau_i, tau_j \in \mathbb{N}$ two time stamps, and $\mathcal{D}$ a structure over the signature $S = (C,R,\iota)$.
     Let $\mathbb{D}$ be the set of all structures over the signature $S$.
     $\filter(M, \mathcal{D}, \tau_i, \tau_j) : \mathbb{D} \to \mathbb{D}$ is a function filtering the structure $\mathcal{D}$ on the condition whether $\tau_i$ is in the relative intervals of the masked predicates in $M$ shifted by $\tau_j$.
-    Constant interpretations remain unchanged by the the filtering.
+    Constant interpretations remain unchanged by the filtering.
     Concretely for all $r \in R$, 
     \begin{equation*}
         r^{\filter(M, \mathcal{D}, \tau_i, \tau_j)} 
         = \{v(\bar{t}) \in r^{\mathcal{D}} \mid 
-            \exists ((p,m), I) \in M. 
-                p = r \land m \matches v(\bar{t}) 
+            \exists m,I. ((r,m), I) \in M. 
+                \land m \matches v(\bar{t}) 
                 \land \tau_i - 
                 \tau_j \in I \}.
     \end{equation*}
