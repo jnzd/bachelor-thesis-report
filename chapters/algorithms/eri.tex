@@ -199,17 +199,7 @@ The following lemma states that filtering a structure twice has the same effect 
 
 \input{chapters/algorithms/eri-lemmas/double-filter.tex}
 
-
-Basin et al. \cite{Basin2016} defines a \textit{slice} of a temporal structure in Definition 3.1.
-We restate this definition here.
-(In the definition $R$ is part of a signature $S=(C,R,\iota)$.)
-\begin{definition}
-    \label{def:slice}
-    Let $s : [0,l) \to \mathbb{N}$ be a strictly increasing function, with $l \in \mathbb{N} \cup \{\infty\}$.
-    The temporal structure $(\bar{\mathcal{D}}', \bar{\tau}')$ is a \textit{slice} of $(\bar{\mathcal{D}}, \bar{\tau})$ (with respect to the function $s$) if $\tau_{i'} = \tau_{s(i)}$ and $r^{\mathcal{D}'_i} \subseteq r^{\mathcal{D}_{s(i)}}$, for all $i \in [0,l)$ and all $r \in R$.
-\end{definition}
-
-Basin et al. \cite{Basin2016} further defines a $T$-slice in Definition A.2 for slicing a temporal structure in a temporal manner.
+As seen in the previous section Basin et al. \cite{Basin2016} a $T$-slice in Definition A.2 for slicing a temporal structure in a temporal manner.
 We define an analogous notion of an $MT_{\tau}$- slice which is a more fine-grained way of slicing that makes use of masked predicate maps.
 \begin{definition}
     \label{def:mt-slice}
@@ -267,14 +257,9 @@ It is analogous to Lemma A.4 in Basin et al. \cite{Basin2016}.
 
 
 
-%%% Justification/ intuition for also getting all time points inside the entire regular interval
-To get a correct sub trace $\sigma'$ we cannot simply extract the sub trace per predicate and mask.
-There are possibly time points and time stamps in the original trace that have no predicate attached to them.
-Therefore we additionally need to extract all such time stamps that fall into the regular relative interval of the formula.
-Empty time points or time stamps can influence the truth value of a formula and can therefore not be omitted.
+We finish this section the same way we finished the section about "normal" regular intervals, by showing how the extended relative intervals can be used to extract a sub-trace that assigns a formula $\phi$ the same truth value at the "current" time point as the original trace.
+Let $k$ be the current time point with time stamp $\tau_k$, and let $(\bar{\mathcal{D}}, \bar{\tau})$ be a trace, and $(\bar{\mathcal{D}}', \bar{\tau}')$ the $(\{\tau_k\} \oplusext M, \{\tau_k\} \oplus I)$- slice of $(\bar{\mathcal{D}}, \bar{\tau})$.
+Then it follows from Lemma \ref{lem:mt-slice-overlap} that $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(M,I,c,k)$- overlapping.
+And from Lemma \ref{lem:eri-overlap} it follows that $(\bar{\mathcal{D}}, \bar{\tau}, v, i) \models \phi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c) \models \phi$.
+Thus at the "current" time point $k$ with time stamp $\tau_k = \tau'_{k-c}$ the two traces assign the formula $\phi$ the same truth value.
 
-The first case of atomic formulas that are not a predicate is trivial.
-They do not depend on any events that may or may not be present in a log and can be evaluated as is.
-Next a simple predicate only depends on the current time point with time stamp $0$.
-For the unary and binary first order logic formulas (negation, quantification, and, or) the extended relative interval is the special union of relative intervals of the sub formula(s).
-Special union referring to the operator that keeps the intervals as intervals.

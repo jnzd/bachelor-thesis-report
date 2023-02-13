@@ -225,14 +225,7 @@ We have the following cases.
         The second possibility for $(\bar{\mathcal{D}}, \bar{\tau}, v, i) not\models \psi \Since{[a,b)} \chi$ is, that for all $j \leq i$ with $\tau_i - \tau_j \in [a,b)$ and $(\bar{\mathcal{D}}, \bar{\tau}, v, j) \models \chi$ there is some $k \in \mathbb{N}$ with $j < k \leq i$, $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \not\models \psi$.
         It follows from this that for every $j' \in \mathbb{N}$ with $j' \leq i-c$, $\tau'_{i-c} - \tau'_{j'} \in [a,b)$, and $(\bar{\mathcal{D}}', \bar{\tau}', v, j') \models \chi$, there exists a $j \in \mathbb{N}$ with $j = j' + c$.
 
-
-
-
-
-        
-
-
-
+        %TODO
 
         \dots
 
@@ -241,3 +234,13 @@ We have the following cases.
         $\psi \Until{[a,b)} \chi$.
         The "Until" case is analogous to the "Since" case.
 \end{itemize}
+
+
+For the MFODL cases, just like for "normal" regular intervals an additional lemma is needed, the proof of needs to be done over both of them, as they are mutually recursive.
+We state this additional lemma here, but forgo the proof for time reasons.
+
+\begin{lemma}
+    \label{lem:eri-completness-reg}
+    Let $\rho$ be a regular expression and $(\bar{\mathcal{D}}, \bar{\tau}), (\bar{\mathcal{D}}', \bar{\tau}')$ temporal structures.
+    If $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(\ERIr(\rho),\RIr(\rho),c,i)$-overlapping, for some $c$ and $i$, then for all valuations $v$ and $j \in \mathbb{N}$, it holds that $(\bar{\mathcal{D}}, \bar{\tau},v,i,j) \modelsreg \rho$ iff $(\bar{\mathcal{D}}',\bar{\tau}',v,i-c,j-c) \modelsreg \rho$.
+\end{lemma}

@@ -45,11 +45,21 @@ We recursively define the relative interval of regular expressions as seen in Ba
 \end{definition}
 
 We want to show that it is sufficient to extract all time points with a time stamp in the relative interval $\RI(\phi)$ for a formula $\phi$ from a trace to evaluate $\phi$.
-Lemma A.4 in Basin et al. \cite{Basin2016} provides exactly this.
-The lemma says that the evaluation of a formula $\phi$ is the same on two different temporal structures (traces) for the time point with index $i$ in the first structure and the time point with index $i-c$ in the second structure if they are $(RI(\phi),c,i)$-overlapping as defined by Definition A.4 in Basin et al. \cite{Basin2016}.
+Lemmas A.2 and A.4 in Basin et al. \cite{Basin2016} provides exactly this.
+We will outline how at the end of this section.
 
-For convenience, we restate Lemma A.4 and the definitions it requires here.
+For convenience, we restate Lemmas A.2 and A.4 as well as the definitions they require, and some auxiliary lemmas here.
 First we recall Definition A.2 from Basin et al. \cite{Basin2016}.
+
+Basin et al. \cite{Basin2016} defines a \textit{slice} of a temporal structure in Definition 3.1.
+We restate this definition here.
+(In the definition $R$ is part of a signature $S=(C,R,\iota)$.)
+\begin{definition}
+    \label{def:slice}
+    Let $s : [0,l) \to \mathbb{N}$ be a strictly increasing function, with $l \in \mathbb{N} \cup \{\infty\}$.
+    The temporal structure $(\bar{\mathcal{D}}', \bar{\tau}')$ is a \textit{slice} of $(\bar{\mathcal{D}}, \bar{\tau})$ (with respect to the function $s$) if $\tau_{i'} = \tau_{s(i)}$ and $r^{\mathcal{D}'_i} \subseteq r^{\mathcal{D}_{s(i)}}$, for all $i \in [0,l)$ and all $r \in R$.
+\end{definition}
+
 \begin{definition}
     \label{def:t-slice}
     Let $T \subseteq \mathbb{Z}$ be an interval and $(\bar{\mathcal{D}}, \bar{\tau})$ a trace.
@@ -74,14 +84,17 @@ Lemma A.1 in Basin et al. \cite{Basin2016} is useful, we restate it here.
     \label{lem:zero-ri}
     For every formula $\phi$, $0 \in \RI(\phi)$.
 \end{lemma}
-The proof that this holds is a structural induction over the formula structure for both MFOTL and MFODL, except that the MFODL part requires a similar lemma for regular expressions.
+\textit{Proof}
+The proof that this holds is a structural induction over the formula structure for both MFOTL and MFODL, except that the MFODL part requires a similar lemma for regular expressions which is mutually recursive with this one.
 
 \begin{lemma}
     \label{lem:zero-ri-reg}
     For every regular expression $\rho$, $0 \in \RIr(\rho)$.
 \end{lemma}
 % The proof of this lemma is a simple structural induction over the structure of regular expressions and is omitted here.
-\textit{Proof} the first case is a regular expression $\rho = \star^k$ for $k \in \mathbb{N}$.
+\textit{Proof}
+For a complete proof, this proof would need to go over both, Lemma \ref{lem:zero-ri} and Lemma \ref{lem:zero-ri-reg}.
+The first case is a regular expression $\rho = \star^k$ for $k \in \mathbb{N}$.
 Trivially $0 \in \RIr(\rho) = \RIr(\star^k) = {0}$.
 Next $\rho = \phi?$ for a formula $\phi$.
 $\RIr(\rho) = \RIr(\phi?) = \RI(\phi)$.
@@ -91,7 +104,14 @@ By the induction hypothesis (IH) $0 \in \RIr(\sigma)$ and $0 \in \RIr(\tau)$.
 Thus $0 \in \RIr(\sigma) \Cup \RIr(\tau) = \RIr(\rho)$.
 Finally $\rho = \sigma *$ for a regular expression $\sigma$.
 By IH $0 \in \RIr(\sigma) = \RIr(\rho)$.
-Therefore Lemma \ref{lem:zero-ri-reg} holds for all regular expressions.
+Therefore Lemma \ref{lem:zero-ri-reg} holds for all regular expressions under the condition that Lemma \ref{lem:zero-ri} also holds.
+
+Lemma A.2 in Basin et al. \cite{Basin2016} goes as follows:
+\begin{lemma}
+    \label{lem:slices-overlap}
+    Let $T \subseteq \mathbb{N}$ and $I \subseteq \mathbb{Z}$ be intervals, $(\bar{\mathcal{D}}, \bar{\tau})$ a temporal structure, and $(\bar{\mathcal{D}}', \bar{\tau}')$ a $(T \oplus I)$- slice of $(\bar{\mathcal{D}}, \bar{\tau})$.
+    The temporal structures $(\bar{\mathcal{D}}, \bar{\tau})$ and $(\bar{\mathcal{D}}', \bar{\tau}')$ are $(I,c,i)$- overlapping for all $i \in \mathbb{N}$ with $\tau_i \in T$, where $c$ is the value in Definition \ref{def:t-slice} used by the function $s$ with respect to $(\bar{\mathcal{D}}, \bar{\tau})$ and its time slice $(\bar{\mathcal{D}}', \bar{\tau}')$.
+\end{lemma}
 
 And finally Lemma A.4 itself.
 \begin{lemma}
@@ -101,8 +121,8 @@ And finally Lemma A.4 itself.
 \end{lemma}
 
 A proof by structural induction on the structure of MFOTL formulas for Lemma A.4 \cite{Basin2016} / Lemma \ref{lem:ri-completness} is provided in Basin et al. \cite{Basin2016}.
-
-For this we need an analogous lemma that works for regular expressions.
+We would like to extend the lemma to MFODL formulas as well.
+For this an analogous lemma that works for regular expressions is needed.
 
 \begin{lemma}
     \label{lem:ri-completness-reg}
@@ -113,6 +133,12 @@ For this we need an analogous lemma that works for regular expressions.
 \textit{Proof}
 Lemmas \ref{lem:ri-completness} and \ref{lem:ri-completness-reg} are mutually recursive and must be proofed in combination by structural induction on both the structure of MFODL formulas (Definition \ref{def:mfodl-formula}) and the structure of regular expressions (Definition \ref{def:regex}).
 For time reasons we forgo this proof and focus on our extension of the idea behind relative intervals in the next section.
+
+We close this section by outlining how Lemmas \ref{lem:ri-completness}, \ref{lem:ri-completness-reg}, and \ref{lem:slices-overlap}.
+For our purposes of a policy change we are essentially taking a $\{\tau_k\} \oplus \RI(\phi)$- slice at some "current" time point with time stamp $\tau_k$, $(\bar{\mathcal{D}}', \bar{\tau}')$, of some temporal structure $(\bar{\mathcal{D}}, \bar{\tau})$.
+From Lemma \ref{lem:slices-overlap} it follows that the slice and $(\bar{\mathcal{D}}, \bar{\tau})$ are $(\RI(\phi), c, k)$ -overlapping for the time point $k$.
+And thus by the Lemmas \ref{lem:ri-completness} and \ref{lem:ri-completness-reg} it follows that for all valuations $v$, $(\bar{\mathcal{D}}, \bar{\tau}, v, k) \models \phi$ iff $(\bar{\mathcal{D}}', \bar{\tau}', v, k-c) \models \phi$.
+Hence the two traces assign the formula $\phi$ the same truth value at the "current" time $\tau_k$.
 % Note that $(\bar{\mathcal{D}}', \bar{\tau}', v, i-c, j-c) \modelsreg \rho$ is defined.
 
 % We write $\sigma = (\bar{\mathcal{D}}, \bar{\tau})$ and $\sigma' = (\bar{\mathcal{D}}', \bar{\tau}')$ as shorthand for the two temporal structures.
