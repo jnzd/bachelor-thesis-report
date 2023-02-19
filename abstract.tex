@@ -1,0 +1,17 @@
+\begin{center}
+\textbf{Abstract}
+\end{center}
+
+Runtime Monitoring is the process of observing a system's behavior and checking it against a formal specification.
+One tool to perform runtime monitoring is MonPoly, which uses metric first order temporal logic (MFOTL) as a policy specification language.
+MonPoly evaluates MFOTL formulas over a timestamped logs of events, or \emph{traces}, that capture the system's behavior.
+
+Natively, the MonPoly tool supports online monitoring only via standard input and on a single machine,
+and does not provide a user-friendly interface to access the events it keeps track of in its state.
+Moreover, MonPoly provides no mechanism for updating or changing the policy being monitored.
+In this talk, we present a new REST-based wrapper that combines MonPoly with the time series database QuestDB to provide a flexible interface supporting both (persistent) logging and (online) monitoring
+of events over the network.
+
+Our wrapper also supports policy change by starting a new instance of MonPoly and initializing its state using a fragment of the persistent logs.
+We present an algorithm that significantly reduces the size of the log fragment that needs to be extracted to initialize the new state.
+Our algorithm builds on an extension of the notion of relative intervals of MFOTL formulas introduced by Basin, Caronni, et al. 
